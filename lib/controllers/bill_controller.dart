@@ -1,0 +1,147 @@
+import 'dart:convert';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import '../models/bill_model.dart';
+import '../models/transaction_model.dart';
+import 'transaction_controller.dart';
+
+class BillController extends GetxController {
+  var bills = <BillModel>[].obs;
+  var isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadBills();
+  }
+
+  Future<void> loadBills() async {
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final billsString = prefs.getString('bills');
+      if (billsString != null) {
+        final List<dynamic> jsonList = jsonDecode(billsString);
+        bills.value = jsonList.map((e) => BillModel.fromJson(e)).toList();
+      } else {
+        // Load default mock bills
+        final now = DateTime.now();
+        bills.value = [
+          BillModel(
+            id: 'bill_1',
+            name: 'Electricity Bill',
+            amount: 85.40,
+            dueDate: now.add(const Duration(days: 3)),
+            isPaid: false,
+            category: 'Utilities',
+            autoPay: true,
+            provider: 'Metro Power Utility',
+          ),
+          BillModel(
+            id: 'bill_2',
+            name: 'High-speed Internet',
+            amount: 59.99,
+            dueDate: now.add(const Duration(days: 5)),
+            isPaid: false,
+            category: 'Internet',
+            autoPay: false,
+            provider: 'Comcast Broadband',
+          ),
+          BillModel(
+            id: 'bill_3',
+            name: 'Netflix Premium Subscription',
+            amount: 19.99,
+            dueDate: now.add(const Duration(days: 12)),
+            isPaid: true,
+            category: 'Entertainment',
+            autoPay: true,
+            provider: 'Netflix Inc.',
+          ),
+          BillModel(
+            id: 'bill_4',
+            name: 'Water Services',
+            amount: 32.50,
+            dueDate: now.add(const Duration(days: 14)),
+            isPaid: false,
+            category: 'Utilities',
+            autoPay: false,
+            provider: 'Municipal Water Board',
+          ),
+          BillModel(
+            id: 'bill_5',
+            name: 'Adobe Creative Cloud',
+            amount: 52.99,
+            dueDate: now.add(const Duration(days: 20)),
+            isPaid: false,
+            category: 'Software',
+            autoPay: true,
+            provider: 'Adobe Systems',
+          ),
+        ];
+        await saveBills();
+      }
+    } catch (e) {
+      Get.log("Error loading bills: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> saveBills() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final billsString = jsonEncode(bills.map((e) => e.toJson()).toList());
+      await prefs.setString('bills', billsString);
+    } catch (e) {
+      Get.log("Error saving bills: $e");
+    }
+  }
+
+  void addBill(BillModel bill) {
+    bills.add(bill);
+    saveBills();
+  }
+
+  void toggleAutoPay(String id) {
+    final index = bills.indexWhere((b) => b.id == id);
+    if (index != -1) {
+      bills[index] = bills[index].copyWith(autoPay: !bills[index].autoPay);
+      saveBills();
+    }
+  }
+
+  bool payBill(String id, String walletId) {
+    final index = bills.indexWhere((b) => b.id == id);
+    if (index != -1) {
+      final bill = bills[index];
+      if (bill.isPaid) return false;
+
+      // Mark as paid
+      bills[index] = bills[index].copyWith(isPaid: true);
+      saveBills();
+
+      // Create transaction
+      try {
+        final txController = Get.find<TransactionController>();
+        final newTx = TransactionModel(
+          id: const Uuid().v4(),
+          title: 'Paid: ${bill.name}',
+          amount: bill.amount,
+          type: 'expense',
+          category: bill.category,
+          date: DateTime.now(),
+          walletId: walletId,
+          payee: bill.provider,
+          note: 'Automatic or manual payment for recurring bill: ${bill.name}',
+          status: 'completed',
+        );
+        txController.addTransaction(newTx);
+        return true;
+      } catch (e) {
+        Get.log("TransactionController not found when paying bill: $e");
+      }
+    }
+    return false;
+  }
+}

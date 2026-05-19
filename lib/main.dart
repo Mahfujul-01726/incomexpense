@@ -1,0 +1,60 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Controllers
+import 'controllers/wallet_controller.dart';
+import 'controllers/transaction_controller.dart';
+import 'controllers/bill_controller.dart';
+import 'controllers/profile_controller.dart';
+import 'controllers/onboarding_controller.dart';
+
+// Views
+import 'views/onboarding/onboarding_screen.dart';
+import 'views/dashboard_screen.dart';
+import 'theme/app_theme.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Preferences
+  final prefs = await SharedPreferences.getInstance();
+  final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+
+  // Initialize Global GetX Controllers
+  Get.put(ProfileController());
+  Get.put(WalletController());
+  Get.put(TransactionController());
+  Get.put(BillController());
+  Get.put(OnboardingController());
+
+  runApp(MyApp(onboardingCompleted: onboardingCompleted));
+}
+
+class MyApp extends StatelessWidget {
+  final bool onboardingCompleted;
+
+  const MyApp({super.key, required this.onboardingCompleted});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      title: 'Income & Expense Tracker',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light, // profile_controller will adjust this based on local storage
+      initialRoute: onboardingCompleted ? '/dashboard' : '/onboarding',
+      getPages: [
+        GetPage(
+          name: '/onboarding',
+          page: () => const OnboardingScreen(),
+        ),
+        GetPage(
+          name: '/dashboard',
+          page: () => DashboardScreen(),
+        ),
+      ],
+    );
+  }
+}
