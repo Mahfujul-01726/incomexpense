@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../controllers/bill_controller.dart';
+import '../../controllers/wallet_controller.dart';
 import '../../models/bill_model.dart';
 import '../../theme/app_theme.dart';
 import 'package:uuid/uuid.dart';
 import 'bill_details_screen.dart';
+import 'bill_payment_screen.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -16,6 +18,7 @@ class BillsScreen extends StatefulWidget {
 
 class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStateMixin {
   final billController = Get.find<BillController>();
+  final walletController = Get.find<WalletController>();
   late TabController _tabController;
 
   @override
@@ -137,7 +140,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
-                _getBillCategoryIcon(bill.category),
+                _getBillIcon(bill.name),
                 color: dueColor,
                 size: 24,
               ),
@@ -175,7 +178,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
               ),
             ),
             const SizedBox(width: 12),
-            // Amount
+            // Amount & Pay button
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -196,7 +199,32 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                       'AUTOPAY',
                       style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
                     ),
-                  )
+                  ),
+                ],
+                if (!bill.isPaid) ...[
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    height: 28,
+                    child: ElevatedButton(
+                      onPressed: () => Get.to(() => BillPaymentScreen(bill: bill)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor.withOpacity(0.12),
+                        foregroundColor: AppTheme.primaryColor,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                      child: const Text('Pay'),
+                    ),
+                  ),
                 ]
               ],
             ),
@@ -240,19 +268,18 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
     );
   }
 
-  IconData _getBillCategoryIcon(String cat) {
-    switch (cat.toLowerCase()) {
-      case 'utilities':
-        return Icons.wb_incandescent_outlined;
-      case 'internet':
-        return Icons.language_rounded;
-      case 'entertainment':
-        return Icons.subscriptions_outlined;
-      case 'software':
-        return Icons.settings_input_composite_rounded;
-      default:
-        return Icons.receipt_long_outlined;
+  IconData _getBillIcon(String name) {
+    final cleanName = name.toLowerCase();
+    if (cleanName.contains('youtube')) {
+      return Icons.play_arrow_rounded;
+    } else if (cleanName.contains('electricity') || cleanName.contains('power')) {
+      return Icons.flash_on_rounded;
+    } else if (cleanName.contains('rent') || cleanName.contains('house')) {
+      return Icons.home_filled;
+    } else if (cleanName.contains('spotify') || cleanName.contains('music')) {
+      return Icons.music_note_rounded;
     }
+    return Icons.receipt_long_outlined;
   }
 
   void _showAddBillDialog(BuildContext context) {

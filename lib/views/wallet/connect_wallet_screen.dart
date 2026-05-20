@@ -708,6 +708,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
             title: 'Paypal',
             desc: 'Connect you paypal account',
             icon: Icons.paypal,
+            imagePath: 'assets/cropped/logo_paypal.png',
           ),
           const SizedBox(height: 60), // spacer before button
           OutlinedButton(
@@ -736,6 +737,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
     required String title,
     required String desc,
     required IconData icon,
+    String? imagePath,
   }) {
     final isSelected = _selectedAccountIndex == index;
     final isDark = Get.isDarkMode;
@@ -755,6 +757,20 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
     final iconColor = isSelected 
         ? const Color(0xFF2F7E79)
         : (isDark ? const Color(0xFF94A3B8) : Colors.white);
+
+    final Widget iconWidget = imagePath != null
+        ? ClipOval(
+            child: Image.asset(
+              imagePath,
+              width: 24,
+              height: 24,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(icon, color: iconColor, size: 24);
+              },
+            ),
+          )
+        : Icon(icon, color: iconColor, size: 24);
 
     return GestureDetector(
       onTap: () {
@@ -791,7 +807,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                   )
                 ] : null,
               ),
-              child: Icon(icon, color: iconColor, size: 24),
+              child: iconWidget,
             ),
             const SizedBox(width: 16),
             Expanded(

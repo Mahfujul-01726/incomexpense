@@ -18,6 +18,8 @@ class TransactionDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = transaction.type == 'income';
     final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final isDark = Get.isDarkMode;
+    final amountColor = isIncome ? const Color(0xFF2F7E79) : const Color(0xFFF44336);
     final wallet = walletController.wallets.firstWhere(
       (w) => w.id == transaction.walletId,
       orElse: () => walletController.wallets.isNotEmpty
@@ -34,90 +36,164 @@ class TransactionDetailsScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transaction Details'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Get.back(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.expenseColor),
-            onPressed: () => _showDeleteConfirmation(context),
-          )
-        ],
-      ),
+      backgroundColor: isDark ? AppTheme.darkBg : const Color(0xFFF8FAFC),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
+            // Gradient Header with AppBar
+            ClipPath(
+              clipper: _DetailsHeaderClipper(),
+              child: Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppTheme.primaryColor,
+                      AppTheme.secondaryColor,
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -30,
+                      left: -30,
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: -60,
+                      right: -40,
+                      child: Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 50,
+                      left: 16,
+                      right: 16,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            onPressed: () => Get.back(),
+                          ),
+                          const Text(
+                            'Transaction Details',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                            onPressed: () => _showDeleteConfirmation(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             // Receipt Card
             Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Get.isDarkMode ? AppTheme.darkSurface : Colors.white,
-                borderRadius: BorderRadius.circular(28),
+                color: isDark ? AppTheme.darkSurface : Colors.white,
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
-                  )
+                  ),
                 ],
               ),
               child: Stack(
                 children: [
-                  // Decorative top colored bar
                   Positioned(
                     top: 0,
                     left: 0,
                     right: 0,
                     child: Container(
-                      height: 8,
+                      height: 6,
                       decoration: BoxDecoration(
-                        color: isIncome ? AppTheme.incomeColor : AppTheme.expenseColor,
+                        color: amountColor,
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(28),
-                          topRight: Radius.circular(28),
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
                         ),
                       ),
                     ),
                   ),
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
                     child: Column(
                       children: [
-                        const SizedBox(height: 16),
-                        // Category Icon
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: (isIncome ? AppTheme.incomeColor : AppTheme.expenseColor).withOpacity(0.1),
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: amountColor.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
                           child: Icon(
-                            isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
-                            color: isIncome ? AppTheme.incomeColor : AppTheme.expenseColor,
-                            size: 36,
+                            isIncome
+                                ? Icons.arrow_downward_rounded
+                                : Icons.arrow_upward_rounded,
+                            color: amountColor,
+                            size: 32,
                           ),
                         ),
-                        const SizedBox(height: 16),
-
-                        // Title
+                        const SizedBox(height: 14),
                         Text(
                           transaction.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppTheme.darkTextPrimary
+                                : const Color(0xFF222222),
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 6),
-
-                        // Category tag
+                        const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Get.isDarkMode ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+                            color: amountColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -125,54 +201,64 @@ class TransactionDetailsScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isIncome ? AppTheme.incomeColor : AppTheme.primaryColor,
+                              color: amountColor,
                             ),
                           ),
                         ),
                         const SizedBox(height: 24),
-
-                        // Amount
                         Text(
                           '${isIncome ? '+' : '-'}${formatter.format(transaction.amount)}',
                           style: TextStyle(
-                            fontSize: 32,
+                            fontSize: 36,
                             fontWeight: FontWeight.bold,
-                            color: isIncome ? AppTheme.incomeColor : AppTheme.expenseColor,
+                            color: amountColor,
                             letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 32),
-
-                        // Receipt Details Divider
+                        const SizedBox(height: 28),
                         Row(
                           children: List.generate(
-                            20,
+                            25,
                             (index) => Expanded(
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 2),
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 2),
                                 height: 1,
-                                color: Get.isDarkMode ? Colors.white24 : Colors.black12,
+                                color: isDark
+                                    ? Colors.white24
+                                    : Colors.black12,
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 32),
-
-                        // Data fields
-                        _buildDetailRow('Status', transaction.status.toUpperCase(), 
-                          valueColor: transaction.status == 'completed' ? AppTheme.incomeColor : AppTheme.warningColor,
-                          isBold: true
-                        ),
+                        const SizedBox(height: 28),
+                        _buildDetailRow(
+                            'Status', transaction.status.toUpperCase(),
+                            valueColor: transaction.status == 'completed'
+                                ? const Color(0xFF2F7E79)
+                                : AppTheme.warningColor,
+                            isBold: true),
                         const SizedBox(height: 18),
-                        _buildDetailRow('Date', DateFormat('MMMM d, yyyy').format(transaction.date)),
+                        _buildDetailRow(
+                            'Date',
+                            DateFormat('MMMM d, yyyy')
+                                .format(transaction.date)),
                         const SizedBox(height: 18),
-                        _buildDetailRow('Time', DateFormat('hh:mm a').format(transaction.date)),
+                        _buildDetailRow(
+                            'Time',
+                            DateFormat('hh:mm a')
+                                .format(transaction.date)),
                         const SizedBox(height: 18),
-                        _buildDetailRow(isIncome ? 'From' : 'To', transaction.payee),
+                        _buildDetailRow(
+                            isIncome ? 'From' : 'To', transaction.payee),
                         const SizedBox(height: 18),
-                        _buildDetailRow('Wallet/Account', wallet.name, secondaryText: wallet.cardNumber),
+                        _buildDetailRow('Wallet/Account', wallet.name,
+                            secondaryText: wallet.cardNumber),
                         const SizedBox(height: 18),
-                        _buildDetailRow('Transaction ID', 'TXN-${transaction.id.substring(0, 8).toUpperCase()}', isCopyable: true),
+                        _buildDetailRow(
+                            'Transaction ID',
+                            'TXN-${transaction.id.length >= 8 ? transaction.id.substring(0, 8).toUpperCase() : transaction.id.toUpperCase().padRight(8, '0')}',
+                            isCopyable: true),
                       ],
                     ),
                   ),
@@ -180,15 +266,21 @@ class TransactionDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Note card
             if (transaction.note.isNotEmpty) ...[
               Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Get.isDarkMode ? AppTheme.darkSurface : Colors.white,
+                  color: isDark ? AppTheme.darkSurface : Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,18 +297,19 @@ class TransactionDetailsScreen extends StatelessWidget {
                       transaction.note,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                        color: isDark
+                            ? AppTheme.darkTextSecondary
+                            : AppTheme.lightTextSecondary,
                         height: 1.4,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
             ],
-
-            // Action Button - Download Receipt
-            SizedBox(
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
@@ -224,16 +317,19 @@ class TransactionDetailsScreen extends StatelessWidget {
                     'Success',
                     'Receipt downloaded successfully to storage.',
                     snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppTheme.incomeColor,
+                    backgroundColor: const Color(0xFF2F7E79),
                     colorText: Colors.white,
                     margin: const EdgeInsets.all(16),
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2F7E79),
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
+                  elevation: 0,
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -245,13 +341,19 @@ class TransactionDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {Color? valueColor, bool isBold = false, String? secondaryText, bool isCopyable = false}) {
+  Widget _buildDetailRow(String label, String value,
+      {Color? valueColor,
+      bool isBold = false,
+      String? secondaryText,
+      bool isCopyable = false}) {
+    final isDark = Get.isDarkMode;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +361,7 @@ class TransactionDetailsScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+            color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
             fontSize: 14,
           ),
         ),
@@ -276,7 +378,10 @@ class TransactionDetailsScreen extends StatelessWidget {
                       value,
                       style: TextStyle(
                         fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-                        color: valueColor ?? (Get.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary),
+                        color: valueColor ??
+                            (isDark
+                                ? AppTheme.darkTextPrimary
+                                : AppTheme.lightTextPrimary),
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.right,
@@ -285,7 +390,8 @@ class TransactionDetailsScreen extends StatelessWidget {
                   ),
                   if (isCopyable) ...[
                     const SizedBox(width: 4),
-                    const Icon(Icons.copy_rounded, size: 14, color: AppTheme.primaryColor),
+                    const Icon(Icons.copy_rounded,
+                        size: 14, color: Color(0xFF2F7E79)),
                   ]
                 ],
               ),
@@ -295,7 +401,9 @@ class TransactionDetailsScreen extends StatelessWidget {
                   secondaryText,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                    color: isDark
+                        ? AppTheme.darkTextSecondary
+                        : AppTheme.lightTextSecondary,
                   ),
                 )
               ]
@@ -310,8 +418,10 @@ class TransactionDetailsScreen extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: const Text('Delete Transaction?'),
-        content: const Text('Are you sure you want to permanently delete this transaction? This will reverse the wallet balance adjustment.'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: const Text(
+            'Are you sure you want to permanently delete this transaction? This will reverse the wallet balance adjustment.'),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
@@ -320,8 +430,8 @@ class TransactionDetailsScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               txController.deleteTransaction(transaction.id);
-              Get.back(); // close dialog
-              Get.back(); // return to home/stats
+              Get.back();
+              Get.back();
               Get.snackbar(
                 'Deleted',
                 'Transaction was deleted.',
@@ -331,10 +441,33 @@ class TransactionDetailsScreen extends StatelessWidget {
                 margin: const EdgeInsets.all(16),
               );
             },
-            child: const Text('Delete', style: TextStyle(color: AppTheme.expenseColor)),
+            child: const Text('Delete',
+                style: TextStyle(color: AppTheme.expenseColor)),
           ),
         ],
       ),
     );
   }
+}
+
+class _DetailsHeaderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 40);
+    final firstControlPoint = Offset(size.width / 2, size.height + 15);
+    final firstEndPoint = Offset(size.width, size.height - 40);
+    path.quadraticBezierTo(
+      firstControlPoint.dx,
+      firstControlPoint.dy,
+      firstEndPoint.dx,
+      firstEndPoint.dy,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

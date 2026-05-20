@@ -17,48 +17,16 @@ class WalletController extends GetxController {
     isLoading.value = true;
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Clear old persisted defaults (migration)
+      final migrated = prefs.getBool('wallets_migrated');
+      if (migrated != true) {
+        await prefs.remove('wallets');
+        await prefs.setBool('wallets_migrated', true);
+      }
       final walletsString = prefs.getString('wallets');
       if (walletsString != null) {
         final List<dynamic> jsonList = jsonDecode(walletsString);
         wallets.value = jsonList.map((e) => WalletModel.fromJson(e)).toList();
-      } else {
-        // Load default mock data
-        wallets.value = [
-          WalletModel(
-            id: 'wallet_1',
-            name: 'Debit Card',
-            balance: 5750.25,
-            cardHolder: 'Mahfujur Rahman',
-            cardNumber: '**** **** **** 4892',
-            expiryDate: '12/28',
-            type: 'card',
-            colorIndex: 0,
-            bankLogo: 'Visa',
-          ),
-          WalletModel(
-            id: 'wallet_2',
-            name: 'Chase Checking',
-            balance: 12450.80,
-            cardHolder: 'Mahfujur Rahman',
-            cardNumber: '**** **** **** 8812',
-            expiryDate: '09/30',
-            type: 'bank',
-            colorIndex: 1,
-            bankLogo: 'Chase',
-          ),
-          WalletModel(
-            id: 'wallet_3',
-            name: 'PayPal Wallet',
-            balance: 890.50,
-            cardHolder: 'Mahfujur Rahman',
-            cardNumber: 'mahfuj@example.com',
-            expiryDate: 'N/A',
-            type: 'bank',
-            colorIndex: 2,
-            bankLogo: 'PayPal',
-          ),
-        ];
-        await saveWallets();
       }
     } catch (e) {
       Get.log("Error loading wallets: $e");

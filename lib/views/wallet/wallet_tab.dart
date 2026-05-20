@@ -5,11 +5,11 @@ import 'package:uuid/uuid.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../controllers/transaction_controller.dart';
 import '../../controllers/bill_controller.dart';
-import '../../models/bill_model.dart';
 import '../../models/transaction_model.dart';
 import '../../theme/app_theme.dart';
 import '../home/transaction_details_screen.dart';
 import '../home/home_tab.dart';
+import '../bills/bill_payment_screen.dart';
 import 'connect_wallet_screen.dart';
 
 class WalletTab extends StatefulWidget {
@@ -25,7 +25,6 @@ class _WalletTabState extends State<WalletTab> {
   final billController = Get.find<BillController>();
 
   int _selectedTab = 0; // 0 = Transactions, 1 = Upcoming Bills
-  String _selectedWalletId = 'all'; // 'all' or specific wallet ID for filtering
 
   @override
   Widget build(BuildContext context) {
@@ -127,35 +126,45 @@ class _WalletTabState extends State<WalletTab> {
                                 ),
                               ),
                               // Notification Icon inside translucent box
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.notifications_none_rounded,
-                                      color: Colors.white,
-                                      size: 22,
-                                    ),
-                                    // Notification orange dot
-                                    Positioned(
-                                      top: 10,
-                                      right: 11,
-                                      child: Container(
-                                        width: 7,
-                                        height: 7,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.orangeAccent,
-                                          shape: BoxShape.circle,
+                              GestureDetector(
+                                onTap: () {
+                                  Get.snackbar(
+                                    'Notifications',
+                                    'No new notifications.',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    margin: const EdgeInsets.all(16),
+                                  );
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.notifications_none_rounded,
+                                        color: Colors.white,
+                                        size: 22,
+                                      ),
+                                      // Notification orange dot
+                                      Positioned(
+                                        top: 10,
+                                        right: 11,
+                                        child: Container(
+                                          width: 7,
+                                          height: 7,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.orangeAccent,
+                                            shape: BoxShape.circle,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -196,16 +205,7 @@ class _WalletTabState extends State<WalletTab> {
                         ),
                         const SizedBox(height: 8),
                         Obx(() {
-                          double balance = 0;
-                          if (_selectedWalletId == 'all') {
-                            balance = walletController.totalBalance;
-                          } else {
-                            final idx = walletController.wallets.indexWhere((w) => w.id == _selectedWalletId);
-                            if (idx != -1) {
-                              balance = walletController.wallets[idx].balance;
-                            }
-                          }
-                          final balanceStr = NumberFormat('#,##0.00').format(balance);
+                          final balanceStr = NumberFormat('#,##0.00').format(walletController.totalBalance);
                           return Text(
                             '\$ $balanceStr',
                             style: TextStyle(
@@ -256,10 +256,6 @@ class _WalletTabState extends State<WalletTab> {
               ],
             ),
             const SizedBox(height: 30),
-
-            // Horizontal Wallet Filter Chip List
-            _buildWalletFilterList(isDark),
-            const SizedBox(height: 8),
 
             // Sliding Tab/Segmented Control
             _buildTabSelector(isDark),
@@ -328,91 +324,6 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  Widget _buildWalletFilterList(bool isDark) {
-    return Obx(() {
-      return Container(
-        height: 38,
-        margin: const EdgeInsets.only(bottom: 8),
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          itemCount: walletController.wallets.length + 2, // +1 for All, +1 for Add Wallet
-          itemBuilder: (context, index) {
-            if (index == walletController.wallets.length + 1) {
-              // "+ Add Wallet" chip
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: ActionChip(
-                  avatar: const Icon(Icons.add_rounded, size: 16, color: Color(0xFF2F7E79)),
-                  label: const Text('Add Wallet'),
-                  backgroundColor: isDark ? AppTheme.darkSurface : Colors.white,
-                  labelStyle: const TextStyle(
-                    color: Color(0xFF2F7E79),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ConnectWalletScreen(
-                          onBack: () => Navigator.pop(context),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
-
-            final isAll = index == 0;
-            final walletId = isAll ? 'all' : walletController.wallets[index - 1].id;
-            final walletName = isAll ? 'All Wallets' : walletController.wallets[index - 1].name;
-            final isSelected = _selectedWalletId == walletId;
-
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: ChoiceChip(
-                label: Text(walletName),
-                selected: isSelected,
-                selectedColor: const Color(0xFF2F7E79),
-                backgroundColor: isDark ? AppTheme.darkSurface : Colors.white,
-                labelStyle: TextStyle(
-                  color: isSelected
-                      ? Colors.white
-                      : (isDark ? Colors.white70 : const Color(0xFF666666)),
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  fontSize: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: isSelected
-                        ? Colors.transparent
-                        : (isDark ? Colors.white12 : const Color(0xFFE2E8F0)),
-                  ),
-                ),
-                onSelected: (selected) {
-                  if (selected) {
-                    setState(() {
-                      _selectedWalletId = walletId;
-                    });
-                  }
-                },
-              ),
-            );
-          },
-        ),
-      );
-    });
-  }
-
   Widget _buildTabSelector(bool isDark) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -476,10 +387,7 @@ class _WalletTabState extends State<WalletTab> {
 
   Widget _buildTransactionsList(bool isDark) {
     return Obx(() {
-      final transactions = txController.transactions.where((tx) {
-        if (_selectedWalletId == 'all') return true;
-        return tx.walletId == _selectedWalletId;
-      }).toList();
+      final transactions = txController.transactions.toList();
 
       if (transactions.isEmpty) {
         return Container(
@@ -653,7 +561,7 @@ class _WalletTabState extends State<WalletTab> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () => _showPayBillSheet(context, bill),
+                  onPressed: () => Get.to(() => BillPaymentScreen(bill: bill)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2F7E79).withOpacity(isDark ? 0.2 : 0.08),
                     foregroundColor: const Color(0xFF2F7E79),
@@ -1129,125 +1037,6 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  void _showPayBillSheet(BuildContext context, BillModel bill) {
-    final isDark = Get.isDarkMode;
-    if (bill.isPaid) {
-      Get.snackbar(
-        'Already Paid',
-        'This bill is already settled.',
-        backgroundColor: Colors.orangeAccent,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 40),
-        decoration: BoxDecoration(
-          color: isDark ? AppTheme.darkSurface : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Pay Bill',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF222222),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Bill: ${bill.name}',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              'Provider: ${bill.provider}',
-              style: TextStyle(fontSize: 14, color: isDark ? Colors.white60 : Colors.black54),
-            ),
-            Text(
-              'Amount: \$${bill.amount.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2F7E79)),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Select Wallet to Pay From',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white70 : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: walletController.wallets.length,
-              itemBuilder: (context, index) {
-                final wallet = walletController.wallets[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: isDark ? Colors.white10 : Colors.black12,
-                    ),
-                  ),
-                  color: isDark ? AppTheme.darkBg : Colors.white,
-                  child: ListTile(
-                    title: Text(wallet.name),
-                    subtitle: Text('Balance: \$${wallet.balance.toStringAsFixed(2)}'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () {
-                      if (wallet.balance < bill.amount) {
-                        Get.snackbar(
-                          'Insufficient Balance',
-                          'Selected wallet does not have enough balance to pay this bill.',
-                          backgroundColor: Colors.redAccent,
-                          colorText: Colors.white,
-                        );
-                        return;
-                      }
-
-                      // Deduct from wallet
-                      walletController.updateWalletBalance(wallet.id, bill.amount, 'expense');
-                      // Mark bill as paid
-                      final success = billController.payBill(bill.id, wallet.id);
-
-                      Get.back();
-                      if (success) {
-                        Get.snackbar(
-                          'Payment Completed',
-                          'Paid \$${bill.amount.toStringAsFixed(2)} for ${bill.name} successfully.',
-                          backgroundColor: const Color(0xFF2F7E79),
-                          colorText: Colors.white,
-                        );
-                      }
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class WalletHeaderWaveClipper extends CustomClipper<Path> {
