@@ -38,30 +38,92 @@
 ## Features
 
 ### Authentication & Onboarding
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/1.png" alt="Onboarding Screen" width="200"/>
+  <figcaption>Splash & Onboarding flow</figcaption>
+</figure>
+
 - Splash screen with fade-in animation and automatic auth state resolution
-- 3-step onboarding flow introducing core app capabilities
+- 3-step onboarding carousel introducing core app capabilities
 - Google Sign-In via Firebase Authentication
 - Guest mode for users who prefer to explore without signing in
 
 ### Dashboard
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Homepage3.png" alt="Home Dashboard" width="200"/>
+  <figcaption>Home tab — balance card & recent transactions</figcaption>
+</figure>
+
 - **Home** — Total balance card with income/expense breakdown, recent transaction feed, and quick-send contact avatars
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Statistic4.png" alt="Statistics" width="200"/>
+  <figcaption>Statistics tab — interactive charts</figcaption>
+</figure>
+
 - **Statistics** — Period filters (Day / Week / Month / Year) with interactive line charts powered by `fl_chart`, income/expense type segmentation, and top spending breakdown
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Wallet7.png" alt="Wallets" width="200"/>
+  <figcaption>Wallet tab — balance & actions</figcaption>
+</figure>
+
 - **Wallets** — Multi-wallet management, balance overview, segmented transaction/upcoming bills view, QR-code-based payments via `mobile_scanner`
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Profile6.png" alt="Profile" width="200"/>
+  <figcaption>Profile tab — settings & sign-out</figcaption>
+</figure>
+
 - **Profile** — User profile management, dark theme toggle, biometric lock, data export, and sign-out
 
 ### Transaction Management
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Add%20Expense5.png" alt="Add Transaction" width="200"/>
+  <figcaption>Add transaction form</figcaption>
+</figure>
+
 - Add transactions with merchant selection (Netflix, YouTube, PayPal, Upwork, etc.), categorized tags, date picker, wallet source, optional notes and invoice attachments
-- Receipt-style transaction details with copyable transaction ID, status badges, and delete with automatic balance reversal
 - Income/expense type toggle on every transaction
 
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Transaction%20Details%20(Income)11.png" alt="Transaction Details Income" width="200"/>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Transaction%20Details%20(Expense)12.png" alt="Transaction Details Expense" width="200"/>
+  <figcaption>Receipt-style transaction details (income & expense)</figcaption>
+</figure>
+
+- Receipt-style transaction details with copyable transaction ID, status badges, and delete with automatic balance reversal
+
 ### Wallets & Cards
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Connect%20Wallet10.png" alt="Connect Wallet" width="200"/>
+  <figcaption>Connect wallet — cards & accounts</figcaption>
+</figure>
+
 - Add debit cards with form fields for card number, expiry, CVC, and ZIP code
 - Connect bank accounts via bank link, microdeposits, or PayPal
 - QR scanner for wallet-to-wallet payments
 
 ### Bills & Payments
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Bill%20Details13.png" alt="Bill Details" width="200"/>
+  <figcaption>Bill detail — invoice layout & auto-pay</figcaption>
+</figure>
+
 - Upcoming/due bills with overdue, due-today, and due-in-X-days status indicators
 - Bill details with invoice-style layout and auto-pay toggle
+
+<figure>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Bill%20Payment14.png" alt="Bill Payment Step 1" width="200"/>
+  <img src="Income%20%26%20Expense%20Tracker%20App%20(Community)/Bill%20Payment15.png" alt="Bill Payment Step 3" width="200"/>
+  <figcaption>3-step payment wizard: review → confirm → receipt</figcaption>
+</figure>
+
 - 3-step payment wizard: review → confirm → success with receipt
 
 ### Personalization
@@ -303,59 +365,48 @@ flutter build appbundle
 
 ## Project Structure
 
-```mermaid
-block-beta
-  columns 3
-
-  block:EntryPoint["Entry Point"]:1
-    columns 1
-    main["main.dart<br/>Get.put() DI<br/>GetPage routes"]
-  end
-
-  block:Theme["Theme"]:1
-    columns 1
-    theme["app_theme.dart<br/>Light + Dark"]
-  end
-
-  block:Services["Services"]:1
-    columns 1
-    svc["auth_service.dart<br/>Firebase + Google Auth"]
-  end
-
-  space:3
-
-  block:Controllers["Controllers (GetX)"]:1
-    columns 1
-    ac["auth_controller.dart"]
-    bc["bill_controller.dart"]
-    oc["onboarding_controller.dart"]
-    pc["profile_controller.dart"]
-    tc["transaction_controller.dart"]
-    wc["wallet_controller.dart"]
-  end
-
-  block:Models["Models"]:1
-    columns 1
-    bm["bill_model.dart"]
-    tm["transaction_model.dart"]
-    wm["wallet_model.dart"]
-  end
-
-  block:Views["Views / Screens"]:1
-    columns 1
-    splash["splash_screen.dart"]
-    dash["dashboard_screen.dart"]
-    onboard["onboarding/"]
-    auth["auth/"]
-    home["home/"]
-    stats["statistics/"]
-    wallet["wallet/"]
-    profile["profile/"]
-    bills["bills/"]
-    addtxn["add_transaction/"]
-  end
-end
-
+```
+lib/
+├── main.dart                        # Entry point, DI, route config
+├── theme/
+│   └── app_theme.dart               # Light + dark theme definitions
+├── controllers/                     # GetX business logic + reactive state
+│   ├── auth_controller.dart
+│   ├── bill_controller.dart
+│   ├── onboarding_controller.dart
+│   ├── profile_controller.dart
+│   ├── transaction_controller.dart
+│   └── wallet_controller.dart
+├── models/                          # JSON-serializable data classes
+│   ├── bill_model.dart
+│   ├── transaction_model.dart
+│   └── wallet_model.dart
+├── services/                        # External service abstractions
+│   └── auth_service.dart
+└── views/                           # UI screens by feature
+    ├── splash_screen.dart
+    ├── dashboard_screen.dart
+    ├── onboarding/
+    │   └── onboarding_screen.dart
+    ├── auth/
+    │   └── signin_screen.dart
+    ├── home/
+    │   ├── home_tab.dart
+    │   └── transaction_details_screen.dart
+    ├── statistics/
+    │   └── statistics_tab.dart
+    ├── wallet/
+    │   ├── wallet_tab.dart
+    │   ├── connect_wallet_screen.dart
+    │   └── qr_scanner_screen.dart
+    ├── profile/
+    │   └── profile_tab.dart
+    ├── bills/
+    │   ├── bills_screen.dart
+    │   ├── bill_details_screen.dart
+    │   └── bill_payment_screen.dart
+    └── add_transaction/
+        └── add_transaction_screen.dart
 ```
 
 ---
