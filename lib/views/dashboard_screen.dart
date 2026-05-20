@@ -10,7 +10,9 @@ import '../../theme/app_theme.dart';
 class DashboardScreen extends StatelessWidget {
   DashboardScreen({super.key});
 
-  final NavigationController navController = Get.put(NavigationController());
+  final NavigationController navController = Get.isRegistered<NavigationController>()
+      ? Get.find<NavigationController>()
+      : Get.put(NavigationController());
 
   final List<Widget> _tabs = [
     HomeTab(),
