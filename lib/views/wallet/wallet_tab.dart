@@ -26,16 +26,9 @@ class _WalletTabState extends State<WalletTab> {
 
   int _selectedTab = 0; // 0 = Transactions, 1 = Upcoming Bills
   String _selectedWalletId = 'all'; // 'all' or specific wallet ID for filtering
-  bool _showConnectWallet = false;
 
   @override
   Widget build(BuildContext context) {
-    if (_showConnectWallet) {
-      return ConnectWalletScreen(
-        onBack: () => setState(() => _showConnectWallet = false),
-      );
-    }
-
     final isDark = Get.isDarkMode;
     final statusBarHeight = MediaQuery.of(context).padding.top;
 
@@ -47,8 +40,10 @@ class _WalletTabState extends State<WalletTab> {
             // Curved Teal Header
             Stack(
               clipBehavior: Clip.none,
-              alignment: Alignment.center,
+              alignment: Alignment.topCenter,
               children: [
+                // Invisible spacer to make Stack tall enough for hit testing
+                const SizedBox(height: 360),
                 // Wave background
                 ClipPath(
                   clipper: WalletHeaderWaveClipper(),
@@ -230,19 +225,14 @@ class _WalletTabState extends State<WalletTab> {
                               icon: Icons.add,
                               label: 'Add',
                               onTap: () {
-                                setState(() {
-                                  _showConnectWallet = true;
-                                });
-                              },
-                            ),
-                            _buildActionButton(
-                              context,
-                              icon: Icons.account_balance_wallet_rounded,
-                              label: 'Connect',
-                              onTap: () {
-                                setState(() {
-                                  _showConnectWallet = true;
-                                });
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ConnectWalletScreen(
+                                      onBack: () => Navigator.pop(context),
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                             _buildActionButton(
@@ -265,8 +255,7 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ],
             ),
-            // Leave space for the overlapping card (overlapping is 130 + card height around 230 = 360 total height)
-            const SizedBox(height: 150),
+            const SizedBox(height: 30),
 
             // Horizontal Wallet Filter Chip List
             _buildWalletFilterList(isDark),
@@ -369,9 +358,14 @@ class _WalletTabState extends State<WalletTab> {
                     ),
                   ),
                   onPressed: () {
-                    setState(() {
-                      _showConnectWallet = true;
-                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ConnectWalletScreen(
+                          onBack: () => Navigator.pop(context),
+                        ),
+                      ),
+                    );
                   },
                 ),
               );
