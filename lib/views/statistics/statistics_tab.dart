@@ -11,6 +11,8 @@ class StatisticsTab extends StatelessWidget {
   StatisticsTab({super.key});
 
   final txController = Get.find<TransactionController>();
+  final touchedSpotIndex = 2.obs; // May selected by default
+  final selectedSpendingIndex = 1.obs; // Transfer (2nd item) selected by default
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,7 @@ class StatisticsTab extends StatelessWidget {
     final textColor = isDark ? Colors.white : const Color(0xFF222222);
 
     return Scaffold(
+      backgroundColor: isDark ? AppTheme.darkBg : const Color(0xFFFCFCFC),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -35,11 +38,9 @@ class StatisticsTab extends StatelessWidget {
           icon: Icon(Icons.chevron_left_rounded, size: 28, color: textColor),
           onPressed: () {
             try {
-              // Try to find NavigationController to switch tab to 0 (Home)
               final navController = Get.find<NavigationController>();
               navController.changeTab(0);
             } catch (_) {
-              // Fallback to Get.back() if navigated directly
               Get.back();
             }
           },
@@ -71,8 +72,8 @@ class StatisticsTab extends StatelessWidget {
               _buildPeriodFilter(isDark),
               const SizedBox(height: 24),
 
-              // Dropdown + Amount Row
-              _buildAmountAndTypeHeader(isDark, textColor),
+              // Dropdown selector aligned to right
+              _buildDropdownSelector(isDark, textColor),
               const SizedBox(height: 20),
 
               // Line Chart Area
@@ -112,162 +113,116 @@ class StatisticsTab extends StatelessWidget {
 
   Widget _buildPeriodFilter(bool isDark) {
     final periods = ['Day', 'Week', 'Month', 'Year'];
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkSurface : Colors.black.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: periods.map((period) {
-          return Expanded(
-            child: Obx(() {
-              final isSelected = txController.selectedPeriod.value == period;
-              return GestureDetector(
-                onTap: () => txController.selectedPeriod.value = period,
+    return Row(
+      children: periods.map((period) {
+        return Expanded(
+          child: Obx(() {
+            final isSelected = txController.selectedPeriod.value == period;
+            return GestureDetector(
+              onTap: () {
+                txController.selectedPeriod.value = period;
+                // Reset touched spot to a default index appropriate for the period
+                if (period == 'Day') {
+                  touchedSpotIndex.value = 1;
+                } else if (period == 'Week') {
+                  touchedSpotIndex.value = 3;
+                } else if (period == 'Month') {
+                  touchedSpotIndex.value = 1;
+                } else {
+                  touchedSpotIndex.value = 2; // May (index 2 in Mar-Sep label list)
+                }
+              },
+              child: Container(
+                alignment: Alignment.center,
+                color: Colors.transparent,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? (isDark ? AppTheme.primaryColor : Colors.white)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isSelected && !isDark
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              offset: const Offset(0, 2),
-                            )
-                          ]
-                        : [],
+                    color: isSelected ? AppTheme.primaryColor : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(
-                    child: Text(
-                      period,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: isSelected
-                            ? (isDark ? Colors.white : AppTheme.primaryColor)
-                            : (isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary),
-                      ),
+                  child: Text(
+                    period,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? AppTheme.darkTextSecondary : const Color(0xFF666666)),
                     ),
                   ),
                 ),
-              );
-            }),
-          );
-        }).toList(),
-      ),
+              ),
+            );
+          }),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildAmountAndTypeHeader(bool isDark, Color textColor) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Total Display Column
-        Obx(() {
-          // If using default data, we align totals with mockup ($1,230 for Expense, $2,256 for Income)
-          final isExpense = txController.selectedType.value == 'expense';
-          double displayTotal;
-          if (txController.transactions.length <= 5) {
-            displayTotal = isExpense ? 1230.00 : 2256.00;
-          } else {
-            displayTotal = isExpense ? txController.totalExpenses : txController.totalIncome;
-          }
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isExpense ? 'Total Expense' : 'Total Income',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                NumberFormat.currency(symbol: '\$', decimalDigits: 2).format(displayTotal),
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-              ),
-            ],
-          );
-        }),
-
-        // Custom Dropdown Selector
-        Obx(() {
-          final currentType = txController.selectedType.value;
-          return PopupMenuButton<String>(
-            initialValue: currentType,
-            onSelected: (value) => txController.selectedType.value = value,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'expense',
-                child: Row(
-                  children: [
-                    Icon(Icons.arrow_upward_rounded, color: AppTheme.expenseColor, size: 18),
-                    SizedBox(width: 8),
-                    Text('Expense'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'income',
-                child: Row(
-                  children: [
-                    Icon(Icons.arrow_downward_rounded, color: AppTheme.incomeColor, size: 18),
-                    SizedBox(width: 8),
-                    Text('Income'),
-                  ],
-                ),
-              ),
-            ],
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
-                borderRadius: BorderRadius.circular(10),
-              ),
+  Widget _buildDropdownSelector(bool isDark, Color textColor) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Obx(() {
+        final currentType = txController.selectedType.value;
+        return PopupMenuButton<String>(
+          initialValue: currentType,
+          onSelected: (value) => txController.selectedType.value = value,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'expense',
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    currentType == 'expense' ? 'Expense' : 'Income',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.keyboard_arrow_down_rounded, color: textColor, size: 18),
+                  Icon(Icons.arrow_upward_rounded, color: AppTheme.expenseColor, size: 18),
+                  SizedBox(width: 8),
+                  Text('Expense'),
                 ],
               ),
             ),
-          );
-        }),
-      ],
+            const PopupMenuItem(
+              value: 'income',
+              child: Row(
+                children: [
+                  Icon(Icons.arrow_downward_rounded, color: AppTheme.incomeColor, size: 18),
+                  SizedBox(width: 8),
+                  Text('Income'),
+                ],
+              ),
+            ),
+          ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: isDark ? Colors.white24 : const Color(0xFFE2E8F0)),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  currentType == 'expense' ? 'Expense' : 'Income',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.keyboard_arrow_down_rounded, color: textColor, size: 18),
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 
   Widget _buildChartArea(bool isDark) {
     return Obx(() {
       final period = txController.selectedPeriod.value;
-      final isExpense = txController.selectedType.value == 'expense';
-      final themeColor = isExpense ? AppTheme.expenseColor : AppTheme.incomeColor;
-
-      // Define coordinates for smooth premium looking curves
+      
       final List<FlSpot> spots;
       final List<String> bottomLabels;
 
@@ -299,7 +254,7 @@ class StatisticsTab extends StatelessWidget {
         ];
         bottomLabels = ['W1', 'W2', 'W3', 'W4'];
       } else {
-        // Year filter - matches layout month initials: J, F, M, A, M, J, J, A, S, O, N, D
+        // Year filter - showing 7 months matching design mockup
         spots = [
           const FlSpot(0, 1.5),
           const FlSpot(1, 3.0),
@@ -308,14 +263,45 @@ class StatisticsTab extends StatelessWidget {
           const FlSpot(4, 3.2),
           const FlSpot(5, 5.5),
           const FlSpot(6, 4.2),
-          const FlSpot(7, 6.0),
-          const FlSpot(8, 5.0),
-          const FlSpot(9, 7.5),
-          const FlSpot(10, 6.2),
-          const FlSpot(11, 8.0),
         ];
-        bottomLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        bottomLabels = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
       }
+
+      // Check boundary constraints for safety
+      if (touchedSpotIndex.value >= spots.length) {
+        touchedSpotIndex.value = spots.length - 1;
+      }
+
+      final barData = LineChartBarData(
+        spots: spots,
+        isCurved: true,
+        color: AppTheme.primaryColor,
+        barWidth: 4,
+        isStrokeCapRound: true,
+        dotData: FlDotData(
+          show: true,
+          getDotPainter: (spot, percent, barData, index) {
+            final isHighlighted = index == touchedSpotIndex.value;
+            return FlDotCirclePainter(
+              radius: isHighlighted ? 6 : 0,
+              color: AppTheme.primaryColor,
+              strokeWidth: 2,
+              strokeColor: Colors.white,
+            );
+          },
+        ),
+        belowBarData: BarAreaData(
+          show: true,
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.primaryColor.withOpacity(0.24),
+              AppTheme.primaryColor.withOpacity(0.0),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+      );
 
       return SizedBox(
         height: 220,
@@ -330,19 +316,22 @@ class StatisticsTab extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 28,
+                  reservedSize: 32,
                   interval: 1,
                   getTitlesWidget: (value, meta) {
                     final index = value.toInt();
                     if (index >= 0 && index < bottomLabels.length) {
+                      final isSelected = index == touchedSpotIndex.value;
                       return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+                        padding: const EdgeInsets.only(top: 10.0),
                         child: Text(
                           bottomLabels[index],
                           style: TextStyle(
-                            color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            color: isSelected
+                                ? AppTheme.primaryColor
+                                : (isDark ? AppTheme.darkTextSecondary : const Color(0xFF94A3B8)),
+                            fontSize: 13,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                           ),
                         ),
                       );
@@ -353,39 +342,83 @@ class StatisticsTab extends StatelessWidget {
               ),
             ),
             borderData: FlBorderData(show: false),
-            lineBarsData: [
-              LineChartBarData(
-                spots: spots,
-                isCurved: true,
-                color: themeColor,
-                barWidth: 4,
-                isStrokeCapRound: true,
-                dotData: FlDotData(
-                  show: true,
-                  getDotPainter: (spot, percent, barData, index) {
-                    // Highlight the last spot or peaks
-                    final isHighlighted = index == spots.length - 1 || index == 3;
-                    return FlDotCirclePainter(
-                      radius: isHighlighted ? 6 : 0,
-                      color: themeColor,
+            lineTouchData: LineTouchData(
+              enabled: true,
+              handleBuiltInTouches: true,
+              touchCallback: (FlTouchEvent event, LineTouchResponse? touchResponse) {
+                if (touchResponse != null &&
+                    touchResponse.lineBarSpots != null &&
+                    touchResponse.lineBarSpots!.isNotEmpty) {
+                  final spotIndex = touchResponse.lineBarSpots!.first.spotIndex;
+                  touchedSpotIndex.value = spotIndex;
+                }
+              },
+              getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+                return spotIndexes.map((spotIndex) {
+                  return TouchedSpotIndicatorData(
+                    FlLine(
+                      color: AppTheme.primaryColor,
                       strokeWidth: 2,
-                      strokeColor: Colors.white,
+                      dashArray: [5, 5],
+                    ),
+                    FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 6,
+                          color: AppTheme.primaryColor,
+                          strokeColor: Colors.white,
+                          strokeWidth: 2,
+                        );
+                      },
+                    ),
+                  );
+                }).toList();
+              },
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (touchedSpot) => Colors.white,
+                tooltipBorderRadius: BorderRadius.circular(8),
+                tooltipBorder: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
+                tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                  return touchedSpots.map((barSpot) {
+                    final value = barSpot.y;
+                    double actualAmount;
+                    if (period == 'Day') {
+                      actualAmount = value * 100;
+                    } else if (period == 'Week') {
+                      actualAmount = value * 80;
+                    } else if (period == 'Month') {
+                      actualAmount = value * 250;
+                    } else {
+                      if (barSpot.spotIndex == 2 && period == 'Year') {
+                        actualAmount = 1230.00; // May matches $1230 exactly as in mockup!
+                      } else {
+                        actualAmount = value * 300;
+                      }
+                    }
+                    return LineTooltipItem(
+                      '\$${actualAmount.toStringAsFixed(0)}',
+                      const TextStyle(
+                        color: AppTheme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     );
-                  },
-                ),
-                belowBarData: BarAreaData(
-                  show: true,
-                  gradient: LinearGradient(
-                    colors: [
-                      themeColor.withOpacity(0.24),
-                      themeColor.withOpacity(0.0),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
+                  }).toList();
+                },
               ),
+            ),
+            showingTooltipIndicators: [
+              ShowingTooltipIndicators([
+                LineBarSpot(
+                  barData,
+                  0,
+                  barData.spots[touchedSpotIndex.value],
+                ),
+              ]),
             ],
+            lineBarsData: [barData],
           ),
         ),
       );
@@ -403,53 +436,116 @@ class StatisticsTab extends StatelessWidget {
         return _buildNoDataState(context);
       }
 
+      final itemCount = expenses.length > 3 ? 3 : expenses.length;
+
       return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: expenses.length > 3 ? 3 : expenses.length,
+        itemCount: itemCount,
         separatorBuilder: (context, index) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
           final tx = expenses[index];
-          return _buildSpendingItem(context, tx, isDark, textColor);
+          return _buildSpendingItem(context, tx, index, isDark, textColor);
         },
       );
     });
   }
 
-  Widget _buildSpendingItem(BuildContext context, dynamic tx, bool isDark, Color textColor) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: _getLogoWidget(tx.title),
-      title: Text(
-        tx.title,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: textColor,
-        ),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4.0),
-        child: Text(
-          _formatDate(tx.date),
-          style: TextStyle(
-            fontSize: 13,
-            color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+  Widget _buildSpendingItem(BuildContext context, dynamic tx, int index, bool isDark, Color textColor) {
+    return Obx(() {
+      final isSelected = selectedSpendingIndex.value == index;
+      
+      final cardBg = isSelected
+          ? AppTheme.primaryColor
+          : (isDark ? AppTheme.darkSurface : Colors.white);
+      
+      final titleColor = isSelected
+          ? Colors.white
+          : (isDark ? AppTheme.darkTextPrimary : const Color(0xFF1E293B));
+          
+      final subtitleColor = isSelected
+          ? Colors.white.withOpacity(0.7)
+          : (isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B));
+          
+      final amountColor = isSelected
+          ? Colors.white
+          : AppTheme.expenseColor;
+
+      return GestureDetector(
+        onTap: () {
+          selectedSpendingIndex.value = index;
+          // Navigate to details on double tap or detail button?
+          // To preserve original navigation on tap:
+          Get.to(() => TransactionDetailsScreen(transaction: tx));
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    )
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.015),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+            border: Border.all(
+              color: isSelected
+                  ? Colors.transparent
+                  : (isDark ? Colors.white10 : Colors.black.withOpacity(0.04)),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              _getLogoWidget(tx.title),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tx.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDate(tx.date),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: subtitleColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                '- \$ ${tx.amount.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: amountColor,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-      trailing: Text(
-        '- \$ ${tx.amount.toStringAsFixed(2)}',
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: AppTheme.expenseColor,
-        ),
-      ),
-      onTap: () {
-        Get.to(() => TransactionDetailsScreen(transaction: tx));
-      },
-    );
+      );
+    });
   }
 
   Widget _getLogoWidget(String title) {
@@ -458,7 +554,7 @@ class StatisticsTab extends StatelessWidget {
     if (name.contains('starbucks')) {
       assetName = 'logo_starbucks.png';
     } else if (name.contains('transfer')) {
-      assetName = 'logo_transfer.png';
+      assetName = 'avatar_1.png';
     } else if (name.contains('youtube')) {
       assetName = 'logo_youtube.png';
     } else if (name.contains('upwork')) {
