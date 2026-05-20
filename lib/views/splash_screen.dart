@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Image.asset(
-          'Income & Expense Tracker App (Community)/1.png',
+          'assets/images/splash.png',
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
