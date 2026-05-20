@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
+import 'onboarding_controller.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
@@ -30,12 +31,8 @@ class AuthController extends GetxController {
       final signedInUser = await _authService.signInWithGoogle();
 
       if (signedInUser != null) {
-        // Mark onboarding as complete so splash goes to dashboard next time
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('onboarding_completed', true);
-
-        Get.back(); // Close the bottom sheet
-        Get.offAllNamed('/dashboard');
+        // Delegate prefs + navigation to OnboardingController
+        await Get.find<OnboardingController>().finishOnboarding();
       }
     } catch (e) {
       Get.snackbar(

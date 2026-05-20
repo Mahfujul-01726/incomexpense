@@ -14,6 +14,7 @@ import 'controllers/onboarding_controller.dart';
 // Views
 import 'views/splash_screen.dart';
 import 'views/onboarding/onboarding_screen.dart';
+import 'views/auth/signin_screen.dart';
 import 'views/dashboard_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -60,6 +61,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/onboarding',
           page: () => const OnboardingScreen(),
+        ),
+        GetPage(
+          name: '/signin',
+          page: () => const SignInScreen(),
         ),
         GetPage(
           name: '/dashboard',

@@ -39,7 +39,13 @@ class OnboardingController extends GetxController {
     completeOnboarding();
   }
 
-  void completeOnboarding() async {
+  /// Called when user taps "Get Started" — navigates to sign-in page.
+  void completeOnboarding() {
+    Get.toNamed('/signin');
+  }
+
+  /// Called after successful sign-in or guest continue to finalise onboarding.
+  Future<void> finishOnboarding() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('onboarding_completed', true);

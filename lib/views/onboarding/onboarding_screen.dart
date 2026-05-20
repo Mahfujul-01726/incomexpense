@@ -1,136 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../controllers/auth_controller.dart';
 import '../../controllers/onboarding_controller.dart';
 import '../../theme/app_theme.dart';
 
 class OnboardingScreen extends GetView<OnboardingController> {
   const OnboardingScreen({super.key});
-
-  void _showLoginSheet(BuildContext context) {
-    final authController = Get.find<AuthController>();
-
-    Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 36,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(28),
-            topRight: Radius.circular(28),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Pull handle
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-
-            // Title
-            Text(
-              'Welcome Back',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.outfit(
-                color: const Color(0xFF2F7E79),
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Sign in to access your tracker',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Google Sign-In Button
-            Obx(() => _GoogleSignInButton(
-                  isLoading: authController.isLoading.value,
-                  onTap: authController.signInWithGoogle,
-                )),
-
-            const SizedBox(height: 20),
-
-            // Divider
-            Row(
-              children: [
-                Expanded(
-                  child: Divider(color: Colors.grey[200], thickness: 1),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    'or',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 13),
-                  ),
-                ),
-                Expanded(
-                  child: Divider(color: Colors.grey[200], thickness: 1),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Continue as guest
-            GestureDetector(
-              onTap: () {
-                Get.back();
-                controller.completeOnboarding();
-              },
-              child: Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: const Color(0xFF2F7E79).withOpacity(0.4),
-                    width: 1.5,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'Continue as Guest',
-                    style: GoogleFonts.outfit(
-                      color: const Color(0xFF2F7E79),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      elevation: 10,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,7 +103,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
 
                       // Already have an account? Log In
                       GestureDetector(
-                        onTap: () => _showLoginSheet(context),
+                        onTap: () => Get.toNamed('/signin'),
                         child: Text.rich(
                           TextSpan(
                             style: GoogleFonts.outfit(
