@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -598,109 +599,126 @@ class _WalletTabState extends State<WalletTab> {
   Widget _buildTransactionIcon(String title, bool isIncome) {
     final cleanTitle = title.toLowerCase();
 
-    if (cleanTitle.contains('upwork')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFF1FDF3),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Text(
-          'up',
-          style: TextStyle(
-            color: Color(0xFF14A800),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+    Widget buildGlassContainer({required Widget child, bool isIncome = false}) {
+      final accentColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
+      return ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  accentColor.withOpacity(0.2),
+                  Colors.white.withOpacity(0.06),
+                  accentColor.withOpacity(0.12),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.5),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: accentColor.withOpacity(0.25),
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                child,
+                IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withOpacity(0.35),
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.white.withOpacity(0.08),
+                        ],
+                        stops: const [0.0, 0.25, 0.75, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
+    }
+
+    String? assetPath;
+    if (cleanTitle.contains('upwork')) {
+      assetPath = 'assets/cropped/logo_upwork.png';
     } else if (cleanTitle.contains('paypal')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFF0F4FC),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.paypal,
-          color: Color(0xFF003087),
-          size: 22,
-        ),
-      );
+      assetPath = 'assets/cropped/logo_paypal.png';
     } else if (cleanTitle.contains('youtube')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFECEB),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.play_arrow_rounded,
-          color: Colors.red,
-          size: 24,
-        ),
-      );
+      assetPath = 'assets/cropped/logo_youtube.png';
+    } else if (cleanTitle.contains('starbucks')) {
+      assetPath = 'assets/cropped/logo_starbucks.png';
     } else if (cleanTitle.contains('netflix')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Colors.black87,
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Text(
-          'N',
-          style: TextStyle(
-            color: Colors.red,
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
+      return buildGlassContainer(
+        isIncome: isIncome,
+        child: const Center(
+          child: Text(
+            'N',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.w900,
+              fontSize: 20,
+            ),
           ),
         ),
       );
     } else if (cleanTitle.contains('transfer') ||
         cleanTitle.contains('send') ||
         cleanTitle.contains('john')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: Colors.purple.shade50,
-          shape: BoxShape.circle,
-        ),
-        child: ClipOval(
+      assetPath = 'assets/cropped/profile_icon.png';
+    }
+
+    if (assetPath != null) {
+      return buildGlassContainer(
+        isIncome: isIncome,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
           child: Image.asset(
-            'assets/cropped/profile_icon.png',
-            fit: BoxFit.cover,
+            assetPath,
+            fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.person_rounded, color: Colors.purple.shade700, size: 22);
+              final primaryColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
+              return Icon(
+                isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+                color: primaryColor,
+                size: 22,
+              );
             },
           ),
         ),
       );
-    } else {
-      final primaryColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
+    }
+
+    final primaryColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
+    return buildGlassContainer(
+      isIncome: isIncome,
+      child: Center(
         child: Icon(
           isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
           color: primaryColor,
-          size: 20,
+          size: 22,
         ),
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildBillIcon(String name) {

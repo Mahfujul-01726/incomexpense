@@ -457,7 +457,7 @@ class HomeTab extends StatelessWidget {
         assetName = 'logo_upwork.png';
         break;
       case 'transfer':
-        assetName = 'logo_transfer.png';
+        assetName = 'profile_icon.png';
         break;
       case 'paypal':
         assetName = 'logo_paypal.png';
@@ -471,32 +471,35 @@ class HomeTab extends StatelessWidget {
     }
 
     if (assetName.isNotEmpty) {
+      final double pad = (assetName == 'logo_upwork.png' || assetName == 'profile_icon.png') ? 6 : 10;
       return Container(
-        width: 50,
-        height: 50,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
+        width: 52,
+        height: 52,
+        padding: EdgeInsets.all(pad),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(25),
-          child: Image.asset(
-            'assets/cropped/$assetName',
-            width: 50,
-            height: 50,
-            fit: BoxFit.cover,
+        child: Image.asset(
+          'assets/cropped/$assetName',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Icons.payment_outlined,
+            color: AppTheme.primaryColor.withOpacity(0.5),
+            size: 24,
           ),
         ),
       );
     }
 
     return Container(
-      width: 50,
-      height: 50,
+      width: 52,
+      height: 52,
       decoration: BoxDecoration(
         color: AppTheme.primaryColor.withOpacity(0.1),
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: const Icon(Icons.payment_outlined, color: AppTheme.primaryColor),
+      child: const Icon(Icons.payment_outlined, color: AppTheme.primaryColor, size: 24),
     );
   }
 
