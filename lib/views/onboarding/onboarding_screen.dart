@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../controllers/auth_controller.dart';
 import '../../controllers/onboarding_controller.dart';
 import '../../theme/app_theme.dart';
 
@@ -8,13 +9,15 @@ class OnboardingScreen extends GetView<OnboardingController> {
   const OnboardingScreen({super.key});
 
   void _showLoginSheet(BuildContext context) {
+    final authController = Get.find<AuthController>();
+
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.only(
           left: 24,
           right: 24,
           top: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 36,
         ),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -23,87 +26,104 @@ class OnboardingScreen extends GetView<OnboardingController> {
             topRight: Radius.circular(28),
           ),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Pull handle
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Pull handle
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // Title
+            Text(
+              'Welcome Back',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                color: const Color(0xFF2F7E79),
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Sign in to access your tracker',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Google Sign-In Button
+            Obx(() => _GoogleSignInButton(
+                  isLoading: authController.isLoading.value,
+                  onTap: authController.signInWithGoogle,
+                )),
+
+            const SizedBox(height: 20),
+
+            // Divider
+            Row(
+              children: [
+                Expanded(
+                  child: Divider(color: Colors.grey[200], thickness: 1),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    'or',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                  ),
+                ),
+                Expanded(
+                  child: Divider(color: Colors.grey[200], thickness: 1),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // Continue as guest
+            GestureDetector(
+              onTap: () {
+                Get.back();
+                controller.completeOnboarding();
+              },
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: const Color(0xFF2F7E79).withOpacity(0.4),
+                    width: 1.5,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    'Continue as Guest',
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFF2F7E79),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              Text(
-                'Log In to Mono',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(
-                  color: const Color(0xFF2F7E79),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Access your income & expense tracking',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Email Field
-              TextField(
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF2F7E79)),
-                  hintText: 'Email Address',
-                  filled: true,
-                  fillColor: const Color(0xFFF4F9F9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              // Password Field
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF2F7E79)),
-                  suffixIcon: const Icon(Icons.visibility_off_outlined, color: Colors.grey),
-                  hintText: 'Password',
-                  filled: true,
-                  fillColor: const Color(0xFFF4F9F9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 28),
-              // Login button
-              AnimatedScaleButton(
-                text: 'Log In',
-                onTap: () {
-                  Get.back(); // Close bottom sheet
-                  controller.completeOnboarding();
-                },
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 8),
+          ],
         ),
       ),
       isScrollControlled: true,
@@ -128,7 +148,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
             right: 0,
             height: screenHeight * 0.62,
             child: Container(
-              color: const Color(0xFFEDF6F6), // Matches the base color of the onboarding illustration
+              color: const Color(0xFFEDF6F6),
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 20.0),
@@ -138,16 +158,25 @@ class OnboardingScreen extends GetView<OnboardingController> {
                             width: 250,
                             height: 250,
                             color: AppTheme.primaryColor.withOpacity(0.1),
-                            child: const Icon(Icons.account_balance_wallet_outlined, size: 80, color: AppTheme.primaryColor),
+                            child: const Icon(
+                              Icons.account_balance_wallet_outlined,
+                              size: 80,
+                              color: AppTheme.primaryColor,
+                            ),
                           )
                         : Image.asset(
                             'assets/cropped/onboarding_guy.png',
                             fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => Container(
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
                               width: 250,
                               height: 250,
                               color: AppTheme.primaryColor.withOpacity(0.1),
-                              child: const Icon(Icons.account_balance_wallet_outlined, size: 80, color: AppTheme.primaryColor),
+                              child: const Icon(
+                                Icons.account_balance_wallet_outlined,
+                                size: 80,
+                                color: AppTheme.primaryColor,
+                              ),
                             ),
                           ),
                   ),
@@ -156,7 +185,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
             ),
           ),
 
-          // Bottom section with the white card and diagonal wave curve
+          // Bottom section with white card and diagonal wave curve
           Positioned(
             bottom: 0,
             left: 0,
@@ -173,7 +202,6 @@ class OnboardingScreen extends GetView<OnboardingController> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(height: 12),
-                      // Text title matching 'Spend Smarter Save More'
                       Text(
                         'Spend Smarter\nSave More',
                         textAlign: TextAlign.center,
@@ -185,7 +213,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
                           letterSpacing: -0.5,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 16),
 
                       // Get Started Button
@@ -233,13 +261,182 @@ class OnboardingScreen extends GetView<OnboardingController> {
   }
 }
 
-// Custom Clipper to draw a clean, curved wave separating illustration and content
+// ─────────────────────────────────────────────
+// Google Sign-In branded button
+// ─────────────────────────────────────────────
+class _GoogleSignInButton extends StatefulWidget {
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  const _GoogleSignInButton({
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  @override
+  State<_GoogleSignInButton> createState() => _GoogleSignInButtonState();
+}
+
+class _GoogleSignInButtonState extends State<_GoogleSignInButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _scaleController;
+  double _scale = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      lowerBound: 0.0,
+      upperBound: 0.03,
+    )..addListener(() => setState(() => _scale = 1 - _scaleController.value));
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: widget.isLoading ? null : (_) => _scaleController.forward(),
+      onTapUp: widget.isLoading
+          ? null
+          : (_) {
+              _scaleController.reverse();
+              widget.onTap();
+            },
+      onTapCancel: () => _scaleController.reverse(),
+      child: Transform.scale(
+        scale: _scale,
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: widget.isLoading
+              ? const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF2F7E79),
+                      ),
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Google "G" logo painted manually
+                    _GoogleGLogo(),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Continue with Google',
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF333333),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+// Paints the classic Google "G" logo using simple colored arcs
+class _GoogleGLogo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(24, 24),
+      painter: _GoogleLogoPainter(),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double cx = size.width / 2;
+    final double cy = size.height / 2;
+    final double r = size.width / 2;
+
+    final paint = Paint()..style = PaintingStyle.stroke..strokeWidth = size.width * 0.16;
+
+    // Red (top)
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r * 0.84),
+      _toRad(-230), _toRad(130), false, paint,
+    );
+
+    // Blue (left going down)
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r * 0.84),
+      _toRad(-100), _toRad(-130), false, paint,
+    );
+
+    // Yellow (bottom)
+    paint.color = const Color(0xFFFBBC05);
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r * 0.84),
+      _toRad(120), _toRad(65), false, paint,
+    );
+
+    // Green (right side — partial)
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset(cx, cy), radius: r * 0.84),
+      _toRad(55), _toRad(65), false, paint,
+    );
+
+    // Horizontal bar of "G" — drawn as a filled rect
+    final barPaint = Paint()
+      ..color = const Color(0xFF4285F4)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - 0.5, cy - size.height * 0.1, r + 0.5, size.height * 0.2),
+        const Radius.circular(2),
+      ),
+      barPaint,
+    );
+  }
+
+  double _toRad(double deg) => deg * 3.14159265 / 180;
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ─────────────────────────────────────────────
+// Custom Clipper for onboarding wave
+// ─────────────────────────────────────────────
 class OnboardingClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
     path.moveTo(0, 50);
-    // Smooth Bezier wave from left (y=50) dipping and sloping to right (y=40)
     path.quadraticBezierTo(size.width * 0.5, 0, size.width, 40);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
@@ -251,17 +448,22 @@ class OnboardingClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-// Custom animated button with micro-interaction scale effect
+// ─────────────────────────────────────────────
+// Animated scale button (shared)
+// ─────────────────────────────────────────────
 class AnimatedScaleButton extends StatefulWidget {
   final VoidCallback onTap;
   final String text;
-  const AnimatedScaleButton({super.key, required this.onTap, required this.text});
+
+  const AnimatedScaleButton(
+      {super.key, required this.onTap, required this.text});
 
   @override
   State<AnimatedScaleButton> createState() => _AnimatedScaleButtonState();
 }
 
-class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTickerProviderStateMixin {
+class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
+    with SingleTickerProviderStateMixin {
   late double _scale;
   late AnimationController _controller;
 
@@ -303,9 +505,9 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTi
             borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
               colors: [
-                Color(0xFF63B5AF), // Light teal gradient start
-                Color(0xFF3F9A96), // Medium teal
-                Color(0xFF2F7E79), // Dark teal (AppTheme.secondaryColor)
+                Color(0xFF63B5AF),
+                Color(0xFF3F9A96),
+                Color(0xFF2F7E79),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,

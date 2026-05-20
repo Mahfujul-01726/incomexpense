@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controllers/auth_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../theme/app_theme.dart';
 import '../home/home_tab.dart';
@@ -287,7 +288,35 @@ class ProfileTab extends StatelessWidget {
                       iconColor: AppTheme.expenseColor,
                       textColor: AppTheme.expenseColor,
                       onTap: () {
-                        Get.offAllNamed('/onboarding');
+                        Get.dialog(
+                          AlertDialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            title: const Text('Sign Out',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            content: const Text(
+                                'Are you sure you want to sign out?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Get.back(),
+                                child: const Text('Cancel'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Get.back();
+                                  Get.find<AuthController>().signOut();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.expenseColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                                child: const Text('Sign Out'),
+                              ),
+                            ],
+                          ),
+                        );
                       },
                     ),
                   ],

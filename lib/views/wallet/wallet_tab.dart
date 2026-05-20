@@ -699,82 +699,45 @@ class _WalletTabState extends State<WalletTab> {
 
   Widget _buildBillIcon(String name) {
     final cleanName = name.toLowerCase();
+
+    String? assetPath;
     if (cleanName.contains('youtube')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFECEB),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.play_arrow_rounded,
-          color: Colors.red,
-          size: 24,
-        ),
-      );
-    } else if (cleanName.contains('electricity') || cleanName.contains('power')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFF7ED),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.flash_on_rounded,
-          color: Colors.orange,
-          size: 22,
-        ),
-      );
+      assetPath = 'assets/images/logos/youtube.png';
+    } else if (cleanName.contains('electricity')) {
+      assetPath = 'assets/images/logos/electricity.png';
     } else if (cleanName.contains('rent') || cleanName.contains('house')) {
+      assetPath = 'assets/images/logos/house_rent.png';
+    } else if (cleanName.contains('spotify')) {
+      assetPath = 'assets/images/logos/spotify.png';
+    }
+
+    if (assetPath != null) {
       return Container(
         width: 44,
         height: 44,
+        padding: const EdgeInsets.all(8),
         decoration: const BoxDecoration(
-          color: Color(0xFFF0FDF4),
+          color: Colors.white,
           shape: BoxShape.circle,
         ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.home_filled,
-          color: Color(0xFF15803D),
-          size: 22,
-        ),
-      );
-    } else if (cleanName.contains('spotify') || cleanName.contains('music')) {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFF0FDF4),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.music_note_rounded,
-          color: Colors.green,
-          size: 22,
-        ),
-      );
-    } else {
-      return Container(
-        width: 44,
-        height: 44,
-        decoration: const BoxDecoration(
-          color: Color(0xFFF1F5F9),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.receipt_long_rounded,
-          color: Color(0xFF64748B),
-          size: 22,
-        ),
+        child: Image.asset(assetPath, fit: BoxFit.contain),
       );
     }
+
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: const BoxDecoration(
+        color: Color(0xFFF1F5F9),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: const Icon(
+        Icons.receipt_long_rounded,
+        color: Color(0xFF64748B),
+        size: 22,
+      ),
+    );
   }
 
   void _showPaySimulator(BuildContext context) {

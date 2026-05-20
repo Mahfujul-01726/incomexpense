@@ -1,8 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Controllers
+import 'controllers/auth_controller.dart';
 import 'controllers/wallet_controller.dart';
 import 'controllers/transaction_controller.dart';
 import 'controllers/bill_controller.dart';
@@ -17,12 +19,16 @@ import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
   // Initialize Preferences
   final prefs = await SharedPreferences.getInstance();
   final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
 
   // Initialize Global GetX Controllers
+  Get.put(AuthController());
   Get.put(ProfileController());
   Get.put(WalletController());
   Get.put(TransactionController());
@@ -44,7 +50,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light, // profile_controller will adjust this based on local storage
+      themeMode: ThemeMode.light,
       initialRoute: '/splash',
       getPages: [
         GetPage(

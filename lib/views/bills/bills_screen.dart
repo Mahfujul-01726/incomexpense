@@ -132,19 +132,8 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
         ),
         child: Row(
           children: [
-            // Bill icon based on category
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: dueColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                _getBillIcon(bill.name),
-                color: dueColor,
-                size: 24,
-              ),
-            ),
+            // Bill logo
+            _buildBillLogo(bill.name),
             const SizedBox(width: 14),
             // Title & Due date
             Expanded(
@@ -268,18 +257,48 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
     );
   }
 
-  IconData _getBillIcon(String name) {
+  Widget _buildBillLogo(String name) {
     final cleanName = name.toLowerCase();
+    String? assetPath;
     if (cleanName.contains('youtube')) {
-      return Icons.play_arrow_rounded;
-    } else if (cleanName.contains('electricity') || cleanName.contains('power')) {
-      return Icons.flash_on_rounded;
+      assetPath = 'assets/images/logos/youtube.png';
+    } else if (cleanName.contains('electricity')) {
+      assetPath = 'assets/images/logos/electricity.png';
     } else if (cleanName.contains('rent') || cleanName.contains('house')) {
-      return Icons.home_filled;
-    } else if (cleanName.contains('spotify') || cleanName.contains('music')) {
-      return Icons.music_note_rounded;
+      assetPath = 'assets/images/logos/house_rent.png';
+    } else if (cleanName.contains('spotify')) {
+      assetPath = 'assets/images/logos/spotify.png';
     }
-    return Icons.receipt_long_outlined;
+
+    if (assetPath != null) {
+      return Container(
+        width: 48,
+        height: 48,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Image.asset(assetPath, fit: BoxFit.contain),
+      );
+    }
+
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Icon(Icons.receipt_long_outlined, color: AppTheme.primaryColor, size: 24),
+    );
   }
 
   void _showAddBillDialog(BuildContext context) {

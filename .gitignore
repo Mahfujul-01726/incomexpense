@@ -7,6 +7,17 @@
 .buildlog/
 .history
 
+# Environment & config
+.env*
+
+# IDE
+.idea/
+.vscode/
+
+# Firebase
+**/android/**/google-services.json
+**/ios/**/GoogleService-Info.plist
+
 
 
 # Flutter repo-specific

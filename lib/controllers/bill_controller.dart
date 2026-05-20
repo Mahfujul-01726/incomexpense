@@ -20,6 +20,14 @@ class BillController extends GetxController {
     isLoading.value = true;
     try {
       final prefs = await SharedPreferences.getInstance();
+
+      // Migration: force reload default bills if version mismatch
+      final billVersion = prefs.getInt('bills_version');
+      if (billVersion == null || billVersion < 2) {
+        await prefs.remove('bills');
+        await prefs.setInt('bills_version', 2);
+      }
+
       final billsString = prefs.getString('bills');
       if (billsString != null) {
         final List<dynamic> jsonList = jsonDecode(billsString);
@@ -63,7 +71,7 @@ class BillController extends GetxController {
             name: 'Spotify',
             amount: 9.99,
             dueDate: now.add(const Duration(days: 10)),
-            isPaid: true,
+            isPaid: false,
             category: 'Entertainment',
             autoPay: true,
             provider: 'Spotify AB',
