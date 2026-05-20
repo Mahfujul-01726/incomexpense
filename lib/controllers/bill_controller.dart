@@ -23,7 +23,7 @@ class BillController extends GetxController {
 
       // Migration: force reload default bills if version mismatch
       final billVersion = prefs.getInt('bills_version');
-      if (billVersion == null || billVersion < 2) {
+      if (billVersion == null || billVersion < 3) {
         await prefs.remove('bills');
         await prefs.setInt('bills_version', 2);
       }
@@ -47,16 +47,6 @@ class BillController extends GetxController {
             provider: 'YouTube LLC',
           ),
           BillModel(
-            id: 'bill_2',
-            name: 'Electricity',
-            amount: 85.40,
-            dueDate: now.add(const Duration(days: 7)),
-            isPaid: false,
-            category: 'Utilities',
-            autoPay: false,
-            provider: 'Metro Power Utility',
-          ),
-          BillModel(
             id: 'bill_3',
             name: 'House Rent',
             amount: 1200.00,
@@ -65,6 +55,16 @@ class BillController extends GetxController {
             category: 'Housing',
             autoPay: false,
             provider: 'Sunset Properties',
+          ),
+          BillModel(
+            id: 'bill_2',
+            name: 'Electricity',
+            amount: 85.40,
+            dueDate: now.add(const Duration(days: 7)),
+            isPaid: false,
+            category: 'Utilities',
+            autoPay: false,
+            provider: 'Metro Power Utility',
           ),
           BillModel(
             id: 'bill_4',

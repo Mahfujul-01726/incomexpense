@@ -539,7 +539,7 @@ class HomeTab extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () => _showSendAgainBottomSheet(context),
               child: const Text(
                 'See all',
                 style: TextStyle(
@@ -571,6 +571,103 @@ class HomeTab extends StatelessWidget {
           }).toList(),
         ),
       ],
+    );
+  }
+
+  void _showSendAgainBottomSheet(BuildContext context) {
+    final payees = txController.transactions
+        .where((tx) => tx.payee.isNotEmpty)
+        .map((tx) => tx.payee)
+        .toSet()
+        .toList();
+    final avatarFiles = [
+      'avatar_1.png',
+      'avatar_2.png',
+      'avatar_3.png',
+      'avatar_4.png',
+      'avatar_5.png',
+    ];
+
+    Get.bottomSheet(
+      Container(
+        height: MediaQuery.of(context).size.height * 0.5,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Send Again',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Get.isDarkMode ? Colors.white : const Color(0xFF222222),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: payees.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No contacts yet',
+                        style: TextStyle(color: Colors.grey.shade500, fontSize: 15),
+                      ),
+                    )
+                  : GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.85,
+                      ),
+                      itemCount: payees.length,
+                      itemBuilder: (context, index) {
+                        final payee = payees[index];
+                        final avatarIndex = index % avatarFiles.length;
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(25),
+                              child: Image.asset(
+                                'assets/cropped/${avatarFiles[avatarIndex]}',
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              payee.length > 10 ? '${payee.substring(0, 10)}...' : payee,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Get.isDarkMode ? Colors.white70 : const Color(0xFF666666),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

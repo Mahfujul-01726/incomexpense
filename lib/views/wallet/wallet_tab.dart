@@ -11,6 +11,7 @@ import '../home/transaction_details_screen.dart';
 import '../home/home_tab.dart';
 import '../bills/bill_payment_screen.dart';
 import 'connect_wallet_screen.dart';
+import 'qr_scanner_screen.dart';
 
 class WalletTab extends StatefulWidget {
   const WalletTab({super.key});
@@ -520,7 +521,7 @@ class _WalletTabState extends State<WalletTab> {
           final dateStr = DateFormat('MMM d, yyyy').format(bill.dueDate);
 
           return Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             decoration: BoxDecoration(
               color: isDark ? AppTheme.darkSurface : Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -532,56 +533,61 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                _buildBillIcon(bill.name),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        bill.name,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildBillIcon(bill.name),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          bill.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: isDark ? Colors.white : const Color(0xFF222222),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          dateStr,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark ? Colors.white60 : const Color(0xFF888888),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => Get.to(() => BillPaymentScreen(bill: bill)),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2F7E79).withOpacity(isDark ? 0.2 : 0.08),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Text(
+                        'Pay',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: isDark ? Colors.white : const Color(0xFF222222),
+                          fontSize: 13,
+                          color: Color(0xFF2F7E79),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        dateStr,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isDark ? Colors.white60 : const Color(0xFF888888),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => Get.to(() => BillPaymentScreen(bill: bill)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F7E79).withOpacity(isDark ? 0.2 : 0.08),
-                    foregroundColor: const Color(0xFF2F7E79),
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    'Pay',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -740,84 +746,21 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  void _showPaySimulator(BuildContext context) {
-    final isDark = Get.isDarkMode;
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: isDark ? AppTheme.darkSurface : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white24 : Colors.black12,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Icon(Icons.qr_code_scanner_rounded, size: 64, color: Color(0xFF2F7E79)),
-            const SizedBox(height: 16),
-            Text(
-              'Scan to Pay',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF222222),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Align QR code inside the frame to scan and pay',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.white60 : Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              width: 180,
-              height: 180,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF2F7E79), width: 3),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Center(
-                child: Icon(Icons.camera_alt_outlined, size: 48, color: Colors.grey),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Get.back();
-                Get.snackbar(
-                  'Payment Processed',
-                  'Simulated QR scan completed successfully.',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: const Color(0xFF2F7E79),
-                  colorText: Colors.white,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2F7E79),
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text('Simulate Scan'),
-            ),
-          ],
-        ),
-      ),
+  void _showPaySimulator(BuildContext context) async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const QrScannerScreen()),
     );
+
+    if (result != null && mounted) {
+      Get.snackbar(
+        'Payment Processed',
+        'Scanned QR: $result',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFF2F7E79),
+        colorText: Colors.white,
+      );
+    }
   }
 
   void _showSendSimulator(BuildContext context) {
