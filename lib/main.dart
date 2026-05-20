@@ -10,6 +10,7 @@ import 'controllers/profile_controller.dart';
 import 'controllers/onboarding_controller.dart';
 
 // Views
+import 'views/splash_screen.dart';
 import 'views/onboarding/onboarding_screen.dart';
 import 'views/dashboard_screen.dart';
 import 'theme/app_theme.dart';
@@ -44,8 +45,12 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light, // profile_controller will adjust this based on local storage
-      initialRoute: onboardingCompleted ? '/dashboard' : '/onboarding',
+      initialRoute: '/splash',
       getPages: [
+        GetPage(
+          name: '/splash',
+          page: () => const SplashScreen(),
+        ),
         GetPage(
           name: '/onboarding',
           page: () => const OnboardingScreen(),

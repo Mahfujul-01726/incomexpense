@@ -26,6 +26,21 @@ class TransactionController extends GetxController {
       if (transString != null) {
         final List<dynamic> jsonList = jsonDecode(transString);
         transactions.value = jsonList.map((e) => TransactionModel.fromJson(e)).toList();
+        if (transactions.length == 4 && !transactions.any((tx) => tx.id == 't_5')) {
+          transactions.add(TransactionModel(
+            id: 't_5',
+            title: 'Starbucks',
+            amount: 150.00,
+            type: 'expense',
+            category: 'Food & Dining',
+            date: DateTime(2022, 1, 12, 8, 30),
+            walletId: 'wallet_1',
+            payee: 'Starbucks Coffee',
+            note: 'Coffee and snacks',
+            status: 'completed',
+          ));
+          await saveTransactions();
+        }
       } else {
         // Load default mock data
         final now = DateTime.now();
@@ -76,6 +91,18 @@ class TransactionController extends GetxController {
             walletId: 'wallet_1',
             payee: 'Google Youtube Premium',
             note: 'Monthly premium subscription fee',
+            status: 'completed',
+          ),
+          TransactionModel(
+            id: 't_5',
+            title: 'Starbucks',
+            amount: 150.00,
+            type: 'expense',
+            category: 'Food & Dining',
+            date: DateTime(2022, 1, 12, 8, 30),
+            walletId: 'wallet_1',
+            payee: 'Starbucks Coffee',
+            note: 'Coffee and snacks',
             status: 'completed',
           ),
         ];
@@ -157,7 +184,9 @@ class TransactionController extends GetxController {
     final now = DateTime.now();
     DateTime threshold;
 
-    if (selectedPeriod.value == 'Week') {
+    if (selectedPeriod.value == 'Day') {
+      threshold = now.subtract(const Duration(days: 1));
+    } else if (selectedPeriod.value == 'Week') {
       threshold = now.subtract(const Duration(days: 7));
     } else if (selectedPeriod.value == 'Month') {
       threshold = now.subtract(const Duration(days: 30));

@@ -21,8 +21,8 @@ void main() {
     ));
 
     // Verify elements are displayed
-    expect(find.text('Skip'), findsOneWidget);
-    expect(find.text('Next'), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
+    expect(find.textContaining('Spend Smarter'), findsOneWidget);
+    expect(find.text('Get Started'), findsOneWidget);
+    expect(find.textContaining('Already Have Account?'), findsOneWidget);
   });
 }

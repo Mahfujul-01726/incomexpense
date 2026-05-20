@@ -465,17 +465,26 @@ class HomeTab extends StatelessWidget {
       case 'youtube':
         assetName = 'logo_youtube.png';
         break;
+      case 'starbucks':
+        assetName = 'logo_starbucks.png';
+        break;
     }
 
     if (assetName.isNotEmpty) {
-      return SizedBox(
+      return Container(
         width: 50,
         height: 50,
-        child: Image.asset(
-          'Income & Expense Tracker App (Community)/$assetName',
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: Image.asset(
+            'assets/cropped/$assetName',
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
         ),
       );
     }
@@ -485,9 +494,9 @@ class HomeTab extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
         color: AppTheme.primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        shape: BoxShape.circle,
       ),
-      child: Icon(Icons.payment_outlined, color: AppTheme.primaryColor),
+      child: const Icon(Icons.payment_outlined, color: AppTheme.primaryColor),
     );
   }
 
@@ -554,7 +563,7 @@ class HomeTab extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(27.5),
                 child: Image.asset(
-                  'Income & Expense Tracker App (Community)/$avatar',
+                  'assets/cropped/$avatar',
                   fit: BoxFit.cover,
                 ),
               ),
