@@ -6,6 +6,7 @@ import '../../controllers/transaction_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../models/transaction_model.dart';
 import '../../theme/app_theme.dart';
+import '../wallet/connect_wallet_screen.dart';
 
 class MerchantItem {
   final String name;
@@ -392,52 +393,79 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _showWalletPicker() {
-    final wallets = walletController.wallets;
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Get.isDarkMode ? AppTheme.darkSurface : Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+      Obx(() {
+        final wallets = walletController.wallets;
+        final activeColor = _selectedType == 'income' ? AppTheme.incomeColor : AppTheme.primaryColor;
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Get.isDarkMode ? AppTheme.darkSurface : Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Select Card / Wallet Source',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: wallets.length,
-                itemBuilder: (context, index) {
-                  final wallet = wallets[index];
-                  final isSelected = _selectedWalletId == wallet.id;
-                  final activeColor = _selectedType == 'income' ? AppTheme.incomeColor : AppTheme.primaryColor;
-                  return ListTile(
-                    leading: Icon(Icons.credit_card_rounded, color: activeColor),
-                    title: Text(wallet.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(wallet.cardNumber.split(' ').last),
-                    trailing: isSelected ? Icon(Icons.check_circle, color: activeColor) : null,
-                    onTap: () {
-                      setState(() {
-                        _selectedWalletId = wallet.id;
-                      });
-                      Get.back();
-                    },
-                  );
-                },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select Card / Wallet Source',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: wallets.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == wallets.length) {
+                      return ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: activeColor.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.add_card_rounded, color: activeColor, size: 20),
+                        ),
+                        title: Text(
+                          'Link Card or Bank Account',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: activeColor,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                        onTap: () {
+                          Get.back();
+                          Get.to(() => ConnectWalletScreen());
+                        },
+                      );
+                    }
+
+                    final wallet = wallets[index];
+                    final isSelected = _selectedWalletId == wallet.id;
+                    return ListTile(
+                      leading: Icon(Icons.credit_card_rounded, color: activeColor),
+                      title: Text(wallet.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(wallet.cardNumber.split(' ').last),
+                      trailing: isSelected ? Icon(Icons.check_circle, color: activeColor) : null,
+                      onTap: () {
+                        setState(() {
+                          _selectedWalletId = wallet.id;
+                        });
+                        Get.back();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 
@@ -773,7 +801,33 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             ),
 
                             // WALLET
-                            _buildFieldLabel('WALLET / SOURCE'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _buildFieldLabel('WALLET / SOURCE'),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: TextButton.icon(
+                                    onPressed: () => Get.to(() => ConnectWalletScreen()),
+                                    icon: Icon(Icons.add_card_rounded, size: 14, color: activeColor),
+                                    label: Text(
+                                      'Link Card/Bank',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: activeColor,
+                                      ),
+                                    ),
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             GestureDetector(
                               onTap: _showWalletPicker,
                               child: Container(
