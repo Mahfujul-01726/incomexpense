@@ -201,8 +201,8 @@ Thank you for your payment!
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(top: 14),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        margin: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
               ? (isDark ? const Color(0xFF1E3A37) : const Color(0xFFEEF7F6))
@@ -229,10 +229,10 @@ Thank you for your payment!
             logo,
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
+                child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
@@ -241,7 +241,7 @@ Thank you for your payment!
             Icon(
               isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
               color: isSelected ? const Color(0xFF2F7E79) : const Color(0xFFCBD5E1),
-              size: 24,
+              size: 20,
             ),
           ],
         ),
@@ -252,14 +252,14 @@ Thank you for your payment!
   Widget _buildInvoiceRow(String label, String value, {bool isTotal = false}) {
     final isDark = Get.isDarkMode;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
               color: isTotal
                   ? (isDark ? Colors.white : const Color(0xFF0F172A))
@@ -269,7 +269,7 @@ Thank you for your payment!
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isTotal
                   ? const Color(0xFF2F7E79)
@@ -284,14 +284,14 @@ Thank you for your payment!
   Widget _buildDetailRow(String label, String value, {Color? valueColor}) {
     final isDark = Get.isDarkMode;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -299,7 +299,7 @@ Thank you for your payment!
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: valueColor ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
             ),
@@ -434,8 +434,8 @@ Thank you for your payment!
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Column(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Column(
                         children: [
                           if (_step == 1) _buildStep1(),
                           if (_step == 2) _buildStep2(),
@@ -443,10 +443,10 @@ Thank you for your payment!
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
-                      height: 56,
+                      height: 48,
                       child: ElevatedButton(
                         onPressed: () {
                           if (_step == 1) {
@@ -473,7 +473,7 @@ Thank you for your payment!
                                   ? 'Confirm and Pay'
                                   : 'Share Receipt',
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -498,8 +498,8 @@ Thank you for your payment!
       children: [
         Row(
           children: [
-            _buildBillerLogo(widget.bill.name),
-            const SizedBox(width: 16),
+            _buildBillerLogo(widget.bill.name, size: 64),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,18 +507,18 @@ Thank you for your payment!
                   Text(
                     widget.bill.name.toLowerCase().contains('youtube') ? 'Youtube Premium' : widget.bill.name,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     DateFormat('MMM dd, yyyy').format(widget.bill.dueDate),
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
                     ),
                   ),
@@ -527,22 +527,22 @@ Thank you for your payment!
             )
           ],
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 20),
         _buildInvoiceRow('Price', formatter.format(_price)),
         _buildInvoiceRow('Fee', formatter.format(_fee)),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Divider(
             height: 1,
             color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
           ),
         ),
         _buildInvoiceRow('Total', formatter.format(_total), isTotal: true),
-        const SizedBox(height: 36),
+        const SizedBox(height: 24),
         Text(
           'Select payment method',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
@@ -577,15 +577,15 @@ Thank you for your payment!
     final isDark = Get.isDarkMode;
     return Column(
       children: [
+        const SizedBox(height: 10),
+        _buildBillerLogo(widget.bill.name, size: 64),
         const SizedBox(height: 20),
-        _buildBillerLogo(widget.bill.name),
-        const SizedBox(height: 30),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
             style: TextStyle(
-              fontSize: 20,
-              height: 1.4,
+              fontSize: 17,
+              height: 1.3,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : const Color(0xFF0F172A),
               fontFamily: GoogleFonts.outfit().fontFamily,
@@ -602,11 +602,11 @@ Thank you for your payment!
             ],
           ),
         ),
-        const SizedBox(height: 48),
+        const SizedBox(height: 24),
         _buildInvoiceRow('Price', formatter.format(_price)),
         _buildInvoiceRow('Fee', formatter.format(_fee)),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Divider(
             height: 1,
             color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
@@ -622,21 +622,20 @@ Thank you for your payment!
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         Center(
           child: Column(
             children: [
               Container(
-                width: 80,
-                height: 80,
+                width: 64,
+                height: 64,
                 decoration: const BoxDecoration(
                   color: Color(0xFFECF8F7),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
                   child: Container(
-                    width: 50,
-                    height: 50,
+                    width: 40,
+                    height: 40,
                     decoration: const BoxDecoration(
                       color: Color(0xFF2F7E79),
                       shape: BoxShape.circle,
@@ -645,26 +644,26 @@ Thank you for your payment!
                       child: Icon(
                         Icons.check_rounded,
                         color: Colors.white,
-                        size: 30,
+                        size: 24,
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Text(
                 'Payment Successfully',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 widget.bill.name.toLowerCase().contains('youtube') ? 'Youtube Premium' : widget.bill.name,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
                   fontWeight: FontWeight.w500,
                 ),
@@ -672,7 +671,7 @@ Thank you for your payment!
             ],
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 24),
         GestureDetector(
           onTap: () => setState(() => _showTransactionDetails = !_showTransactionDetails),
           child: Row(
@@ -681,7 +680,7 @@ Thank you for your payment!
               Text(
                 'Transaction details',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
@@ -691,13 +690,13 @@ Thank you for your payment!
                     ? Icons.keyboard_arrow_up_rounded
                     : Icons.keyboard_arrow_down_rounded,
                 color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                size: 24,
+                size: 20,
               ),
             ],
           ),
         ),
         if (_showTransactionDetails) ...[
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           _buildDetailRow('Payment method', _paymentMethod),
           _buildDetailRow('Status', 'Completed', valueColor: const Color(0xFF2F7E79)),
           _buildDetailRow('Time', _formattedTime),
@@ -716,14 +715,14 @@ Thank you for your payment!
               );
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Transaction ID',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
                       fontWeight: FontWeight.w500,
                     ),
@@ -734,16 +733,16 @@ Thank you for your payment!
                       Text(
                         _transactionId.length > 13 ? '${_transactionId.substring(0, 13)}..' : _transactionId,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       const Icon(
                         Icons.copy_rounded,
                         color: Color(0xFF2F7E79),
-                        size: 18,
+                        size: 14,
                       ),
                     ],
                   ),
@@ -753,7 +752,7 @@ Thank you for your payment!
           ),
 
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Divider(
               height: 1,
               color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
@@ -762,7 +761,7 @@ Thank you for your payment!
           _buildInvoiceRow('Price', formatter.format(_price)),
           _buildInvoiceRow('Fee', '- ${formatter.format(_fee)}'),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Divider(
               height: 1,
               color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),

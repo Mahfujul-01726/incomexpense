@@ -128,8 +128,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(top: 14),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        margin: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
               ? (isDark ? const Color(0xFF1E3A37) : const Color(0xFFEEF7F6))
@@ -156,10 +156,10 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
             logo,
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
+                child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
@@ -168,7 +168,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
             Icon(
               isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
               color: isSelected ? const Color(0xFF2F7E79) : const Color(0xFFCBD5E1),
-              size: 24,
+              size: 20,
             ),
           ],
         ),
@@ -179,14 +179,14 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
   Widget _buildInvoiceRow(String label, String value, {bool isTotal = false}) {
     final isDark = Get.isDarkMode;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
               color: isTotal
                   ? (isDark ? Colors.white : const Color(0xFF0F172A))
@@ -196,7 +196,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isTotal
                   ? const Color(0xFF2F7E79)
@@ -340,11 +340,11 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 24),
+                              padding: const EdgeInsets.only(top: 16),
                               child: Row(
                                 children: [
-                                  _buildBillerLogo(bill.name),
-                                  const SizedBox(width: 16),
+                                  _buildBillerLogo(bill.name, size: 64),
+                                  const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,18 +352,18 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                                         Text(
                                           bill.name.toLowerCase().contains('youtube') ? 'Youtube Premium' : bill.name,
                                           style: TextStyle(
-                                            fontSize: 18,
+                                            fontSize: 17,
                                             fontWeight: FontWeight.bold,
                                             color: isDark ? Colors.white : const Color(0xFF0F172A),
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(height: 6),
+                                        const SizedBox(height: 4),
                                         Text(
                                           DateFormat('MMM dd, yyyy').format(bill.dueDate),
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
                                           ),
                                         ),
@@ -373,12 +373,12 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 28),
+                            const SizedBox(height: 20),
 
                             _buildInvoiceRow('Price', formatter.format(price)),
                             _buildInvoiceRow('Fee', formatter.format(fee)),
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Divider(
                                 height: 1,
                                 color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
@@ -386,13 +386,13 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                             ),
                             _buildInvoiceRow('Total', formatter.format(total), isTotal: true),
 
-                            const SizedBox(height: 36),
+                            const SizedBox(height: 24),
 
                             if (!bill.isPaid) ...[
                               Text(
                                 'Select payment method',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                                 ),
@@ -451,10 +451,10 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                     ),
                     if (!bill.isPaid) ...[
                       Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 12),
+                        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 20, top: 12),
                         child: SizedBox(
                           width: double.infinity,
-                          height: 56,
+                          height: 48,
                           child: ElevatedButton(
                             onPressed: _payBill,
                             style: ElevatedButton.styleFrom(
@@ -466,7 +466,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
                             child: const Text(
                               'Pay Now',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

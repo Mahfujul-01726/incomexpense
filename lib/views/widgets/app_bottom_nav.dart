@@ -10,7 +10,9 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navController = Get.find<NavigationController>();
+    final navController = Get.isRegistered<NavigationController>()
+        ? Get.find<NavigationController>()
+        : Get.put(NavigationController());
     final isDark = Get.isDarkMode;
 
     return BottomAppBar(

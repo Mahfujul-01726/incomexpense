@@ -10,6 +10,7 @@ import 'controllers/transaction_controller.dart';
 import 'controllers/bill_controller.dart';
 import 'controllers/profile_controller.dart';
 import 'controllers/onboarding_controller.dart';
+import 'views/home/home_tab.dart';
 
 // Views
 import 'views/splash_screen.dart';
@@ -35,6 +36,7 @@ void main() async {
   Get.put(TransactionController());
   Get.put(BillController());
   Get.put(OnboardingController());
+  Get.put(NavigationController());
 
   runApp(MyApp(onboardingCompleted: onboardingCompleted));
 }
