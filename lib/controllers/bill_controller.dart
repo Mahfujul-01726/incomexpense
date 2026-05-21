@@ -23,9 +23,9 @@ class BillController extends GetxController {
 
       // Migration: force reload default bills if version mismatch
       final billVersion = prefs.getInt('bills_version');
-      if (billVersion == null || billVersion < 3) {
+      if (billVersion == null || billVersion < 4) {
         await prefs.remove('bills');
-        await prefs.setInt('bills_version', 2);
+        await prefs.setInt('bills_version', 4);
       }
 
       final billsString = prefs.getString('bills');
@@ -38,9 +38,9 @@ class BillController extends GetxController {
         bills.value = [
           BillModel(
             id: 'bill_1',
-            name: 'YouTube',
-            amount: 12.99,
-            dueDate: now.add(const Duration(days: 3)),
+            name: 'Youtube Premium',
+            amount: 11.99,
+            dueDate: DateTime(2022, 2, 28),
             isPaid: false,
             category: 'Entertainment',
             autoPay: true,

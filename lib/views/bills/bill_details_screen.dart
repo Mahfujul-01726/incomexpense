@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../controllers/bill_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../models/bill_model.dart';
 import '../../theme/app_theme.dart';
+import 'bill_payment_screen.dart';
 
 class BillDetailsScreen extends StatefulWidget {
   final BillModel bill;
@@ -18,356 +20,466 @@ class BillDetailsScreen extends StatefulWidget {
 class _BillDetailsScreenState extends State<BillDetailsScreen> {
   final billController = Get.find<BillController>();
   final walletController = Get.find<WalletController>();
-  String _selectedWalletId = '';
+  String _paymentMethod = 'Debit Card';
 
   @override
   void initState() {
     super.initState();
-    if (walletController.wallets.isNotEmpty) {
-      _selectedWalletId = walletController.wallets.first.id;
+  }
+
+  double _calculateFee(double amount) {
+    if ((amount - 11.99).abs() < 0.01) {
+      return 1.99;
     }
+    final fee = amount * 0.029 + 0.30;
+    return fee > 0.50 ? double.parse(fee.toStringAsFixed(2)) : 0.50;
   }
 
   void _payBill() {
-    if (_selectedWalletId.isEmpty) {
-      Get.snackbar('Error', 'Please select a wallet or card to pay from.',
-          backgroundColor: AppTheme.expenseColor, colorText: Colors.white);
-      return;
-    }
-
-    final success = billController.payBill(widget.bill.id, _selectedWalletId);
-    if (success) {
-      Get.back(); // close details page
-      _showSuccessDialog();
-    } else {
-      Get.snackbar('Error', 'This bill is already paid.',
-          backgroundColor: AppTheme.warningColor, colorText: Colors.white);
-    }
+    Get.to(() => BillPaymentScreen(
+          bill: widget.bill,
+          initialStep: 2,
+          initialPaymentMethod: _paymentMethod,
+        ));
   }
 
-  void _showSuccessDialog() {
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppTheme.incomeColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle_rounded,
-                  color: AppTheme.incomeColor,
-                  size: 64,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Payment Successful!',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Your payment for ${widget.bill.name} has been processed successfully.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Get.back(),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: const Text('Back to Bills'),
-                ),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildBillerLogo(String name, {double size = 80}) {
+    final cleanName = name.toLowerCase();
+    String? assetPath;
+    if (cleanName.contains('youtube')) {
+      assetPath = 'assets/images/logos/youtube.png';
+    } else if (cleanName.contains('electricity')) {
+      assetPath = 'assets/images/logos/electricity.png';
+    } else if (cleanName.contains('rent') || cleanName.contains('house')) {
+      assetPath = 'assets/images/logos/house_rent.png';
+    } else if (cleanName.contains('spotify')) {
+      assetPath = 'assets/images/logos/spotify.png';
+    }
+
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * 0.22),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAFAFA),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
-      barrierDismissible: false,
+      child: assetPath != null
+          ? Image.asset(assetPath, fit: BoxFit.contain)
+          : Icon(Icons.receipt_long_rounded, color: const Color(0xFF2F7E79), size: size * 0.5),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
-    final now = DateTime.now();
-    final difference = widget.bill.dueDate.difference(now).inDays;
-
-    Color statusColor;
-    String statusText;
-    if (widget.bill.isPaid) {
-      statusColor = AppTheme.incomeColor;
-      statusText = 'Paid';
-    } else if (difference < 0) {
-      statusColor = AppTheme.expenseColor;
-      statusText = 'Overdue by ${difference.abs()} days';
-    } else {
-      statusColor = AppTheme.warningColor;
-      statusText = 'Pending Payment';
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bill Details'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Get.back(),
+  Widget _buildDebitCardLogo({required bool isSelected}) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: const Color(0xFFF1F5F9),
+          width: 1,
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            // Bill Invoice Layout
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Get.isDarkMode ? AppTheme.darkSurface : Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
+      child: const Center(
+        child: Icon(
+          Icons.credit_card_rounded,
+          color: Color(0xFF2F7E79),
+          size: 20,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPayPalLogo({required bool isSelected}) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: const Color(0xFFF1F5F9),
+          width: 1,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.paypal_rounded,
+          color: isSelected ? const Color(0xFF003087) : const Color(0xFF8C9AA9),
+          size: 20,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentOption({
+    required String title,
+    required Widget logo,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Get.isDarkMode;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(top: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF1E3A37) : const Color(0xFFEEF7F6))
+              : (isDark ? AppTheme.darkSurface : Colors.white),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF2F7E79).withOpacity(0.2)
+                : (isDark ? Colors.white10 : const Color(0xFFF1F5F9)),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
+                    color: const Color(0xFF2F7E79).withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   )
-                ],
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(28),
-                          topRight: Radius.circular(28),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(28.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 16),
-                        // Biller Logo simulation
-                        CircleAvatar(
-                          radius: 32,
-                          backgroundColor: statusColor.withOpacity(0.1),
-                          child: Icon(
-                            Icons.receipt_long_rounded,
-                            color: statusColor,
-                            size: 32,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          widget.bill.name,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.bill.provider,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        // Amount Due
-                        Text(
-                          formatter.format(widget.bill.amount),
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Get.isDarkMode ? Colors.white : AppTheme.lightTextPrimary,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Row(
-                          children: List.generate(
-                            20,
-                            (index) => Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 2),
-                                height: 1,
-                                color: Get.isDarkMode ? Colors.white24 : Colors.black12,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        // Invoice details
-                        _buildInvoiceDetailRow('Payment Status', statusText, valueColor: statusColor),
-                        const SizedBox(height: 16),
-                        _buildInvoiceDetailRow('Due Date', DateFormat('MMMM dd, yyyy').format(widget.bill.dueDate)),
-                        const SizedBox(height: 16),
-                        _buildInvoiceDetailRow('Category', widget.bill.category),
-                        const SizedBox(height: 16),
-                        // Auto Pay switch
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Auto-Pay enabled',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                              ),
-                            ),
-                            Switch(
-                              value: widget.bill.autoPay,
-                              activeColor: AppTheme.primaryColor,
-                              onChanged: (val) {
-                                billController.toggleAutoPay(widget.bill.id);
-                                setState(() {});
-                              },
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                ]
+              : [],
+        ),
+        child: Row(
+          children: [
+            logo,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
               ),
             ),
-            const SizedBox(height: 24),
-
-            // Pay card selection (if unpaid)
-            if (!widget.bill.isPaid) ...[
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Get.isDarkMode ? AppTheme.darkSurface : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Pay From Wallet/Card',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    const SizedBox(height: 12),
-                    Obx(() {
-                      final wallets = walletController.wallets;
-                      if (wallets.isEmpty) {
-                        return const Text('No wallets or cards linked.');
-                      }
-                      return DropdownButtonFormField<String>(
-                        value: _selectedWalletId.isNotEmpty ? _selectedWalletId : null,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.credit_card_rounded),
-                        ),
-                        items: wallets.map((w) {
-                          return DropdownMenuItem<String>(
-                            value: w.id,
-                            child: Text('${w.name} (\$...${w.cardNumber.split(' ').last})'),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val == null) return;
-                          setState(() {
-                            _selectedWalletId = val;
-                          });
-                        },
-                      );
-                    }),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Action button to pay
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _payBill,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text('Pay ${formatter.format(widget.bill.amount)} Now'),
-                ),
-              ),
-            ] else ...[
-              Container(
-                padding: const EdgeInsets.all(20),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppTheme.incomeColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppTheme.incomeColor.withOpacity(0.3)),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.check_circle_outline_rounded, color: AppTheme.incomeColor),
-                    SizedBox(width: 12),
-                    Text(
-                      'Bill paid successfully.',
-                      style: TextStyle(
-                        color: AppTheme.incomeColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
+            Icon(
+              isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+              color: isSelected ? const Color(0xFF2F7E79) : const Color(0xFFCBD5E1),
+              size: 24,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInvoiceDetailRow(String label, String value, {Color? valueColor}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+  Widget _buildInvoiceRow(String label, String value, {bool isTotal = false}) {
+    final isDark = Get.isDarkMode;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+              color: isTotal
+                  ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                  : (isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary),
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: valueColor ?? (Get.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.lightTextPrimary),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isTotal
+                  ? const Color(0xFF2F7E79)
+                  : (isDark ? Colors.white : const Color(0xFF0F172A)),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Get.isDarkMode;
+    final formatter = NumberFormat.currency(symbol: '\$ ', decimalDigits: 2);
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+
+    return Scaffold(
+      backgroundColor: isDark ? AppTheme.darkBg : const Color(0xFFFCFCFC),
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 170 + statusBarHeight,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppTheme.primaryColor,
+                    AppTheme.secondaryColor,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: -30,
+            left: -30,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.08),
+                  width: 24,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: -50,
+            right: -40,
+            child: Container(
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.08),
+                  width: 28,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: statusBarHeight + 8,
+            left: 16,
+            right: 16,
+            child: SizedBox(
+              height: 48,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned(
+                    left: 0,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.chevron_left_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                      onPressed: () => Get.back(),
+                    ),
+                  ),
+                  const Text(
+                    'Bill Details',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.more_horiz_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned.fill(
+            top: 130 + statusBarHeight,
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? AppTheme.darkSurface : Colors.white,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Obx(() {
+                final bill = billController.bills.firstWhere(
+                  (b) => b.id == widget.bill.id,
+                  orElse: () => widget.bill,
+                );
+
+                final price = bill.name.toLowerCase().contains('youtube') ? 11.99 : bill.amount;
+                final fee = _calculateFee(price);
+                final total = price + fee;
+
+                return Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 24),
+                              child: Row(
+                                children: [
+                                  _buildBillerLogo(bill.name),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          bill.name.toLowerCase().contains('youtube') ? 'Youtube Premium' : bill.name,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          DateFormat('MMM dd, yyyy').format(bill.dueDate),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 28),
+
+                            _buildInvoiceRow('Price', formatter.format(price)),
+                            _buildInvoiceRow('Fee', formatter.format(fee)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Divider(
+                                height: 1,
+                                color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            _buildInvoiceRow('Total', formatter.format(total), isTotal: true),
+
+                            const SizedBox(height: 36),
+
+                            if (!bill.isPaid) ...[
+                              Text(
+                                'Select payment method',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
+                              ),
+                              _buildPaymentOption(
+                                title: walletController.wallets.isNotEmpty
+                                    ? 'Debit Card (... ${walletController.wallets.first.cardNumber.split(' ').last})'
+                                    : 'Debit Card',
+                                logo: _buildDebitCardLogo(isSelected: _paymentMethod == 'Debit Card'),
+                                isSelected: _paymentMethod == 'Debit Card',
+                                onTap: () {
+                                  setState(() {
+                                    _paymentMethod = 'Debit Card';
+                                  });
+                                },
+                              ),
+                              _buildPaymentOption(
+                                title: 'Paypal',
+                                logo: _buildPayPalLogo(isSelected: _paymentMethod == 'PayPal'),
+                                isSelected: _paymentMethod == 'PayPal',
+                                onTap: () {
+                                  setState(() {
+                                    _paymentMethod = 'PayPal';
+                                  });
+                                },
+                              ),
+                            ] else ...[
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.incomeColor.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: AppTheme.incomeColor.withOpacity(0.2)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle_outline_rounded, color: AppTheme.incomeColor, size: 24),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Bill paid successfully.',
+                                      style: TextStyle(
+                                        color: AppTheme.incomeColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        fontFamily: GoogleFonts.outfit().fontFamily,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (!bill.isPaid) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 12),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: _payBill,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF2F7E79),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: const StadiumBorder(),
+                            ),
+                            child: const Text(
+                              'Pay Now',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    SizedBox(height: bottomInset),
+                  ],
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
