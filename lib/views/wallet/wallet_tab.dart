@@ -599,65 +599,6 @@ class _WalletTabState extends State<WalletTab> {
   Widget _buildTransactionIcon(String title, bool isIncome) {
     final cleanTitle = title.toLowerCase();
 
-    Widget buildGlassContainer({required Widget child, bool isIncome = false}) {
-      final accentColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
-      return ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  accentColor.withOpacity(0.2),
-                  Colors.white.withOpacity(0.06),
-                  accentColor.withOpacity(0.12),
-                ],
-                stops: const [0.0, 0.5, 1.0],
-              ),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.5),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: accentColor.withOpacity(0.25),
-                  blurRadius: 20,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                child,
-                IgnorePointer(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.35),
-                          Colors.transparent,
-                          Colors.transparent,
-                          Colors.white.withOpacity(0.08),
-                        ],
-                        stops: const [0.0, 0.25, 0.75, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     String? assetPath;
     if (cleanTitle.contains('upwork')) {
       assetPath = 'assets/cropped/logo_upwork.png';
@@ -668,7 +609,7 @@ class _WalletTabState extends State<WalletTab> {
     } else if (cleanTitle.contains('starbucks')) {
       assetPath = 'assets/cropped/logo_starbucks.png';
     } else if (cleanTitle.contains('netflix')) {
-      return buildGlassContainer(
+      return _buildGlassContainer(
         isIncome: isIncome,
         child: const Center(
           child: Text(
@@ -688,7 +629,7 @@ class _WalletTabState extends State<WalletTab> {
     }
 
     if (assetPath != null) {
-      return buildGlassContainer(
+      return _buildGlassContainer(
         isIncome: isIncome,
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -709,13 +650,72 @@ class _WalletTabState extends State<WalletTab> {
     }
 
     final primaryColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
-    return buildGlassContainer(
+    return _buildGlassContainer(
       isIncome: isIncome,
       child: Center(
         child: Icon(
           isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
           color: primaryColor,
           size: 22,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassContainer({required Widget child, bool isIncome = false}) {
+    final accentColor = isIncome ? AppTheme.incomeColor : AppTheme.primaryColor;
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                accentColor.withOpacity(0.2),
+                Colors.white.withOpacity(0.06),
+                accentColor.withOpacity(0.12),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.5),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: accentColor.withOpacity(0.25),
+                blurRadius: 20,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              child,
+              IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withOpacity(0.35),
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.white.withOpacity(0.08),
+                      ],
+                      stops: const [0.0, 0.25, 0.75, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -736,26 +736,15 @@ class _WalletTabState extends State<WalletTab> {
     }
 
     if (assetPath != null) {
-      return Container(
-        width: 44,
-        height: 44,
-        padding: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
+      return _buildGlassContainer(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Image.asset(assetPath, fit: BoxFit.contain),
         ),
-        child: Image.asset(assetPath, fit: BoxFit.contain),
       );
     }
 
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: const BoxDecoration(
-        color: Color(0xFFF1F5F9),
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
+    return _buildGlassContainer(
       child: const Icon(
         Icons.receipt_long_rounded,
         color: Color(0xFF64748B),
