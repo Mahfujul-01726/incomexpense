@@ -16,10 +16,13 @@ class BillsScreen extends StatefulWidget {
   State<BillsScreen> createState() => _BillsScreenState();
 }
 
-class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStateMixin {
+class _BillsScreenState extends State<BillsScreen>
+    with SingleTickerProviderStateMixin {
   final billController = Get.find<BillController>();
   final walletController = Get.find<WalletController>();
   late TabController _tabController;
+
+  final _dummyBillIds = {'bill_1', 'bill_2', 'bill_3', 'bill_4'};
 
   @override
   void initState() {
@@ -53,7 +56,9 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
           controller: _tabController,
           indicatorColor: AppTheme.primaryColor,
           labelColor: Get.isDarkMode ? Colors.white : AppTheme.primaryColor,
-          unselectedLabelColor: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+          unselectedLabelColor: Get.isDarkMode
+              ? AppTheme.darkTextSecondary
+              : AppTheme.lightTextSecondary,
           tabs: const [
             Tab(text: 'Upcoming / Due'),
             Tab(text: 'Paid History'),
@@ -72,8 +77,21 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
 
   Widget _buildBillList({required bool isPaidFilter}) {
     return Obx(() {
-      final list = billController.bills.where((b) => b.isPaid == isPaidFilter).toList();
-      
+      final list = billController.bills.where((b) {
+        if (isPaidFilter) {
+          return b.isPaid && !_dummyBillIds.contains(b.id);
+        }
+        return !b.isPaid || _dummyBillIds.contains(b.id);
+      }).toList();
+
+      const dummyOrder = {'bill_1': 1, 'bill_2': 2, 'bill_3': 3, 'bill_4': 4};
+      list.sort((a, b) {
+        final aOrder = dummyOrder[a.id] ?? 99;
+        final bOrder = dummyOrder[b.id] ?? 99;
+        if (aOrder != bOrder) return aOrder.compareTo(bOrder);
+        return a.dueDate.compareTo(b.dueDate);
+      });
+
       if (list.isEmpty) {
         return _buildEmptyBills(isPaidFilter);
       }
@@ -94,10 +112,10 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
     final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
     final now = DateTime.now();
     final difference = bill.dueDate.difference(now).inDays;
-    
+
     Color dueColor;
     String dueText;
-    
+
     if (bill.isPaid) {
       dueColor = AppTheme.incomeColor;
       dueText = 'Paid';
@@ -127,7 +145,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
               color: Colors.black.withOpacity(0.01),
               blurRadius: 10,
               offset: const Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Row(
@@ -142,7 +160,10 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                 children: [
                   Text(
                     bill.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -160,7 +181,9 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                     'Due: ${DateFormat('MMM dd, yyyy').format(bill.dueDate)}',
                     style: TextStyle(
                       fontSize: 11,
-                      color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                      color: Get.isDarkMode
+                          ? AppTheme.darkTextSecondary
+                          : AppTheme.lightTextSecondary,
                     ),
                   ),
                 ],
@@ -174,19 +197,29 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
               children: [
                 Text(
                   formatter.format(bill.amount),
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 if (bill.autoPay) ...[
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(
                       'AUTOPAY',
-                      style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                   ),
                 ],
@@ -195,12 +228,22 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                   SizedBox(
                     height: 28,
                     child: ElevatedButton(
-                      onPressed: () => Get.to(() => BillPaymentScreen(bill: bill)),
+                      onPressed: () => Get.to(
+                        () => BillPaymentScreen(
+                          bill: bill,
+                          fromBillsScreen: true,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor.withOpacity(0.12),
+                        backgroundColor: AppTheme.primaryColor.withOpacity(
+                          0.12,
+                        ),
                         foregroundColor: AppTheme.primaryColor,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 0,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(
@@ -214,7 +257,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                       child: const Text('Pay'),
                     ),
                   ),
-                ]
+                ],
               ],
             ),
           ],
@@ -231,7 +274,9 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isPaidFilter ? Icons.history_rounded : Icons.pending_actions_rounded,
+              isPaidFilter
+                  ? Icons.history_rounded
+                  : Icons.pending_actions_rounded,
               size: 56,
               color: AppTheme.primaryColor.withOpacity(0.4),
             ),
@@ -247,7 +292,9 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                   : 'You have no outstanding or upcoming bills due.',
               style: TextStyle(
                 fontSize: 12,
-                color: Get.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                color: Get.isDarkMode
+                    ? AppTheme.darkTextSecondary
+                    : AppTheme.lightTextSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -297,7 +344,11 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
         color: AppTheme.primaryColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Icon(Icons.receipt_long_outlined, color: AppTheme.primaryColor, size: 24),
+      child: const Icon(
+        Icons.receipt_long_outlined,
+        color: AppTheme.primaryColor,
+        size: 24,
+      ),
     );
   }
 
@@ -314,35 +365,60 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
         builder: (context, setDialogState) {
           return AlertDialog(
             title: const Text('Add Scheduled Bill'),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: nameField,
-                    decoration: const InputDecoration(labelText: 'Bill Name', hintText: 'e.g. Electricity, Gym'),
+                    decoration: const InputDecoration(
+                      labelText: 'Bill Name',
+                      hintText: 'e.g. Electricity, Gym',
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: amountField,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Amount Due', hintText: 'e.g. 45.00'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Amount Due',
+                      hintText: 'e.g. 45.00',
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: providerField,
-                    decoration: const InputDecoration(labelText: 'Biller / Provider', hintText: 'e.g. Comcast, Netflix'),
+                    decoration: const InputDecoration(
+                      labelText: 'Biller / Provider',
+                      hintText: 'e.g. Comcast, Netflix',
+                    ),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: category,
                     decoration: const InputDecoration(labelText: 'Category'),
                     items: const [
-                      DropdownMenuItem(value: 'Utilities', child: Text('Utilities')),
-                      DropdownMenuItem(value: 'Internet', child: Text('Internet')),
-                      DropdownMenuItem(value: 'Entertainment', child: Text('Entertainment')),
-                      DropdownMenuItem(value: 'Software', child: Text('Software')),
+                      DropdownMenuItem(
+                        value: 'Utilities',
+                        child: Text('Utilities'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Internet',
+                        child: Text('Internet'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Entertainment',
+                        child: Text('Entertainment'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Software',
+                        child: Text('Software'),
+                      ),
                       DropdownMenuItem(value: 'Other', child: Text('Other')),
                     ],
                     onChanged: (val) {
@@ -376,8 +452,14 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Due Date', style: TextStyle(fontSize: 12)),
-                          Text(DateFormat('MMMM dd, yyyy').format(dueDate), style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const Text(
+                            'Due Date',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            DateFormat('MMMM dd, yyyy').format(dueDate),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
                       TextButton(
@@ -386,7 +468,9 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                             context: context,
                             initialDate: dueDate,
                             firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(const Duration(days: 365)),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
                           ).then((picked) {
                             if (picked != null) {
                               setDialogState(() {
@@ -396,9 +480,9 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
                           });
                         },
                         child: const Text('Change'),
-                      )
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -444,7 +528,7 @@ class _BillsScreenState extends State<BillsScreen> with SingleTickerProviderStat
               ),
             ],
           );
-        }
+        },
       ),
     );
   }

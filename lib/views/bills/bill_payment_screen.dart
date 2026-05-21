@@ -7,19 +7,23 @@ import '../../controllers/bill_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../controllers/transaction_controller.dart';
 import '../../models/bill_model.dart';
-import '../../models/transaction_model.dart';
 import '../../theme/app_theme.dart';
+import '../widgets/app_bottom_nav.dart';
 
 class BillPaymentScreen extends StatefulWidget {
   final BillModel bill;
   final int initialStep;
   final String initialPaymentMethod;
+  final bool fromBillsScreen;
+  final bool fromDetailsScreen;
 
   const BillPaymentScreen({
     super.key,
     required this.bill,
     this.initialStep = 1,
     this.initialPaymentMethod = 'Debit Card',
+    this.fromBillsScreen = false,
+    this.fromDetailsScreen = false,
   });
 
   @override
@@ -41,6 +45,7 @@ class _BillPaymentScreenState extends State<BillPaymentScreen> {
   late double _total;
   late String _formattedTime;
   late String _formattedDate;
+  var _showTransactionDetails = true;
 
   @override
   void initState() {
@@ -75,40 +80,15 @@ class _BillPaymentScreenState extends State<BillPaymentScreen> {
   }
 
   void _processPayment() {
-    if (_selectedWalletId.isEmpty) {
-      Get.snackbar('Error', 'No wallet found. Please add a wallet first.',
-          backgroundColor: AppTheme.expenseColor, colorText: Colors.white);
-      return;
-    }
+    final walletId = _selectedWalletId.isNotEmpty 
+        ? _selectedWalletId 
+        : (walletController.wallets.isNotEmpty 
+            ? walletController.wallets.first.id 
+            : 'demo_wallet');
 
-    final wallet = walletController.wallets.firstWhereOrNull((w) => w.id == _selectedWalletId);
-    if (wallet == null || wallet.balance < _total) {
-      Get.snackbar('Insufficient Balance',
-          'Your selected wallet does not have enough balance to complete this payment.',
-          backgroundColor: AppTheme.expenseColor, colorText: Colors.white);
-      return;
-    }
+    billController.payBill(widget.bill.id, walletId, createTransaction: false);
 
-    walletController.updateWalletBalance(_selectedWalletId, widget.bill.amount, 'expense');
-    billController.payBill(widget.bill.id, _selectedWalletId);
-
-    final newTx = TransactionModel(
-      id: _transactionId,
-      title: 'Paid: ${widget.bill.name}',
-      amount: widget.bill.amount,
-      type: 'expense',
-      category: widget.bill.category,
-      date: DateTime.now(),
-      walletId: _selectedWalletId,
-      payee: widget.bill.provider,
-      note: 'Payment via $_paymentMethod. Fee: ${formatter.format(_fee)}',
-      status: 'completed',
-    );
-    txController.addTransaction(newTx);
-
-    setState(() {
-      _step = 3;
-    });
+    setState(() => _step = 3);
   }
 
   void _shareReceipt() {
@@ -507,6 +487,7 @@ Thank you for your payment!
           ),
         ],
       ),
+      bottomNavigationBar: const AppBottomNav(includeFabSpacer: false),
     );
   }
 
@@ -692,96 +673,103 @@ Thank you for your payment!
           ),
         ),
         const SizedBox(height: 36),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Transaction details',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+        GestureDetector(
+          onTap: () => setState(() => _showTransactionDetails = !_showTransactionDetails),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Transaction details',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
+              ),
+              Icon(
+                _showTransactionDetails
+                    ? Icons.keyboard_arrow_up_rounded
+                    : Icons.keyboard_arrow_down_rounded,
+                color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                size: 24,
+              ),
+            ],
+          ),
+        ),
+        if (_showTransactionDetails) ...[
+          const SizedBox(height: 14),
+          _buildDetailRow('Payment method', _paymentMethod),
+          _buildDetailRow('Status', 'Completed', valueColor: const Color(0xFF2F7E79)),
+          _buildDetailRow('Time', _formattedTime),
+          _buildDetailRow('Date', _formattedDate),
+          
+          GestureDetector(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: _transactionId));
+              Get.snackbar(
+                'Copied',
+                'Transaction ID copied to clipboard.',
+                backgroundColor: const Color(0xFF2F7E79),
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                margin: const EdgeInsets.all(16),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Transaction ID',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _transactionId.length > 13 ? '${_transactionId.substring(0, 13)}..' : _transactionId,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.copy_rounded,
+                        color: Color(0xFF2F7E79),
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            Icon(
-              Icons.keyboard_arrow_up_rounded,
-              color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-              size: 24,
-            ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        _buildDetailRow('Payment method', _paymentMethod),
-        _buildDetailRow('Status', 'Completed', valueColor: const Color(0xFF2F7E79)),
-        _buildDetailRow('Time', _formattedTime),
-        _buildDetailRow('Date', _formattedDate),
-        
-        GestureDetector(
-          onTap: () {
-            Clipboard.setData(ClipboardData(text: _transactionId));
-            Get.snackbar(
-              'Copied',
-              'Transaction ID copied to clipboard.',
-              backgroundColor: const Color(0xFF2F7E79),
-              colorText: Colors.white,
-              snackPosition: SnackPosition.BOTTOM,
-              margin: const EdgeInsets.all(16),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Transaction ID',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _transactionId.length > 13 ? '${_transactionId.substring(0, 13)}..' : _transactionId,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(
-                      Icons.copy_rounded,
-                      color: Color(0xFF2F7E79),
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
-        ),
 
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Divider(
-            height: 1,
-            color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Divider(
+              height: 1,
+              color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
+            ),
           ),
-        ),
-        _buildInvoiceRow('Price', formatter.format(_price)),
-        _buildInvoiceRow('Fee', '- ${formatter.format(_fee)}'),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Divider(
-            height: 1,
-            color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
+          _buildInvoiceRow('Price', formatter.format(_price)),
+          _buildInvoiceRow('Fee', '- ${formatter.format(_fee)}'),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(
+              height: 1,
+              color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
+            ),
           ),
-        ),
-        _buildInvoiceRow('Total', formatter.format(_total), isTotal: true),
+          _buildInvoiceRow('Total', formatter.format(_total), isTotal: true),
+        ],
       ],
     );
   }

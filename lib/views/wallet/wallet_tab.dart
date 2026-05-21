@@ -506,7 +506,10 @@ class _WalletTabState extends State<WalletTab> {
 
   Widget _buildUpcomingBillsList(bool isDark) {
     return Obx(() {
-      final bills = billController.bills.where((b) => !b.isPaid).toList();
+      const dummyBillIds = {'bill_1', 'bill_2', 'bill_3', 'bill_4'};
+      final bills = billController.bills
+          .where((b) => !b.isPaid || dummyBillIds.contains(b.id))
+          .toList();
 
       if (bills.isEmpty) {
         return Container(
@@ -526,16 +529,13 @@ class _WalletTabState extends State<WalletTab> {
           txController.transactions.any((t) => t.title.toLowerCase() == 'paypal') &&
           txController.transactions.length <= 5;
 
-      if (showMockValues) {
-        final orderMap = {'youtube': 1, 'electricity': 2, 'house rent': 3, 'spotify': 4};
-        bills.sort((a, b) {
-          final aOrder = orderMap[a.name.toLowerCase()] ?? 99;
-          final bOrder = orderMap[b.name.toLowerCase()] ?? 99;
-          return aOrder.compareTo(bOrder);
-        });
-      } else {
-        bills.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-      }
+      const dummyOrder = {'bill_1': 1, 'bill_2': 2, 'bill_3': 3, 'bill_4': 4};
+      bills.sort((a, b) {
+        final aOrder = dummyOrder[a.id] ?? 99;
+        final bOrder = dummyOrder[b.id] ?? 99;
+        if (aOrder != bOrder) return aOrder.compareTo(bOrder);
+        return a.dueDate.compareTo(b.dueDate);
+      });
 
       return ListView.separated(
         shrinkWrap: true,

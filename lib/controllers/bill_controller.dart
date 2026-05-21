@@ -109,7 +109,7 @@ class BillController extends GetxController {
     }
   }
 
-  bool payBill(String id, String walletId) {
+  bool payBill(String id, String walletId, {bool createTransaction = false}) {
     final index = bills.indexWhere((b) => b.id == id);
     if (index != -1) {
       final bill = bills[index];
@@ -119,26 +119,28 @@ class BillController extends GetxController {
       bills[index] = bills[index].copyWith(isPaid: true);
       saveBills();
 
-      // Create transaction
-      try {
-        final txController = Get.find<TransactionController>();
-        final newTx = TransactionModel(
-          id: const Uuid().v4(),
-          title: 'Paid: ${bill.name}',
-          amount: bill.amount,
-          type: 'expense',
-          category: bill.category,
-          date: DateTime.now(),
-          walletId: walletId,
-          payee: bill.provider,
-          note: 'Automatic or manual payment for recurring bill: ${bill.name}',
-          status: 'completed',
-        );
-        txController.addTransaction(newTx);
-        return true;
-      } catch (e) {
-        Get.log("TransactionController not found when paying bill: $e");
+      if (createTransaction) {
+        // Create transaction
+        try {
+          final txController = Get.find<TransactionController>();
+          final newTx = TransactionModel(
+            id: const Uuid().v4(),
+            title: 'Paid: ${bill.name}',
+            amount: bill.amount,
+            type: 'expense',
+            category: bill.category,
+            date: DateTime.now(),
+            walletId: walletId,
+            payee: bill.provider,
+            note: 'Automatic or manual payment for recurring bill: ${bill.name}',
+            status: 'completed',
+          );
+          txController.addTransaction(newTx);
+        } catch (e) {
+          Get.log("TransactionController not found when paying bill: $e");
+        }
       }
+      return true;
     }
     return false;
   }

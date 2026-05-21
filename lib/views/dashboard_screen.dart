@@ -5,6 +5,7 @@ import 'statistics/statistics_tab.dart';
 import 'wallet/wallet_tab.dart';
 import 'profile/profile_tab.dart';
 import 'add_transaction/add_transaction_screen.dart';
+import 'widgets/app_bottom_nav.dart';
 import '../../theme/app_theme.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -25,7 +26,6 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final selected = navController.selectedIndex.value;
-      final isDark = Get.isDarkMode;
 
       return Scaffold(
         body: IndexedStack(
@@ -58,50 +58,7 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          elevation: 8,
-          height: 64,
-          padding: EdgeInsets.zero,
-          color: isDark ? AppTheme.darkBg : Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(context, 0, Icons.home_rounded, Icons.home_outlined),
-              _buildNavItem(context, 1, Icons.bar_chart_rounded, Icons.bar_chart_outlined),
-              const SizedBox(width: 48), // Spacer for center FAB
-              _buildNavItem(context, 2, Icons.credit_card_rounded, Icons.credit_card_outlined),
-              _buildNavItem(context, 3, Icons.person_rounded, Icons.person_outline_rounded),
-            ],
-          ),
-        ),
-      );
-    });
-  }
-
-  Widget _buildNavItem(BuildContext context, int index, IconData activeIcon, IconData inactiveIcon) {
-    return Obx(() {
-      final isSelected = navController.selectedIndex.value == index;
-      final isDark = Get.isDarkMode;
-      
-      final activeColor = isDark ? AppTheme.secondaryColor : AppTheme.primaryColor;
-      final inactiveColor = isDark ? AppTheme.darkTextSecondary : const Color(0xFFC5C5C5);
-
-      return GestureDetector(
-        onTap: () => navController.changeTab(index),
-        behavior: HitTestBehavior.opaque,
-        child: SizedBox(
-          width: 60,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                isSelected ? activeIcon : inactiveIcon,
-                color: isSelected ? activeColor : inactiveColor,
-                size: 26,
-              ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: const AppBottomNav(),
       );
     });
   }

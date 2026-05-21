@@ -6,6 +6,7 @@ import '../../controllers/bill_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../models/bill_model.dart';
 import '../../theme/app_theme.dart';
+import '../widgets/app_bottom_nav.dart';
 import 'bill_payment_screen.dart';
 
 class BillDetailsScreen extends StatefulWidget {
@@ -40,6 +41,8 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
           bill: widget.bill,
           initialStep: 2,
           initialPaymentMethod: _paymentMethod,
+          fromBillsScreen: true,
+          fromDetailsScreen: true,
         ));
   }
 
@@ -479,6 +482,7 @@ class _BillDetailsScreenState extends State<BillDetailsScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const AppBottomNav(includeFabSpacer: false),
     );
   }
 }
