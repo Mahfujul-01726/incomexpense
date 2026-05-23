@@ -30,7 +30,6 @@ class AppTheme {
         primary: primaryColor,
         secondary: secondaryColor,
         error: expenseColor,
-        background: lightBg,
         surface: lightSurface,
       ),
       textTheme: GoogleFonts.outfitTextTheme(
@@ -77,7 +76,6 @@ class AppTheme {
         primary: primaryColor,
         secondary: secondaryColor,
         error: expenseColor,
-        background: darkBg,
         surface: darkSurface,
       ),
       textTheme: GoogleFonts.outfitTextTheme(

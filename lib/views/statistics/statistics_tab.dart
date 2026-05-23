@@ -53,7 +53,7 @@ class StatisticsTab extends StatelessWidget {
                 'Export Report',
                 'Your transaction statement has been downloaded successfully.',
                 snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: AppTheme.primaryColor.withOpacity(0.9),
+                backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.9),
                 colorText: Colors.white,
               );
             },
@@ -294,8 +294,8 @@ class StatisticsTab extends StatelessWidget {
           show: true,
           gradient: LinearGradient(
             colors: [
-              AppTheme.primaryColor.withOpacity(0.24),
-              AppTheme.primaryColor.withOpacity(0.0),
+              AppTheme.primaryColor.withValues(alpha: 0.24),
+              AppTheme.primaryColor.withValues(alpha: 0.0),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -464,7 +464,7 @@ class StatisticsTab extends StatelessWidget {
           : (isDark ? AppTheme.darkTextPrimary : const Color(0xFF1E293B));
           
       final subtitleColor = isSelected
-          ? Colors.white.withOpacity(0.7)
+          ? Colors.white.withValues(alpha: 0.7)
           : (isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B));
           
       final amountColor = isSelected
@@ -487,14 +487,14 @@ class StatisticsTab extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: AppTheme.primaryColor.withOpacity(0.3),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     )
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.015),
+                      color: Colors.black.withValues(alpha: 0.015),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     )
@@ -502,7 +502,7 @@ class StatisticsTab extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? Colors.transparent
-                  : (isDark ? Colors.white10 : Colors.black.withOpacity(0.04)),
+                  : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04)),
               width: 1,
             ),
           ),
@@ -591,7 +591,7 @@ class StatisticsTab extends StatelessWidget {
       width: 50,
       height: 50,
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.1),
+        color: AppTheme.primaryColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Center(
@@ -632,7 +632,7 @@ class StatisticsTab extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.pie_chart_outline_rounded, size: 48, color: AppTheme.primaryColor.withOpacity(0.5)),
+          Icon(Icons.pie_chart_outline_rounded, size: 48, color: AppTheme.primaryColor.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           const Text(
             'No Data Available',

@@ -210,14 +210,14 @@ Thank you for your payment!
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF2F7E79).withOpacity(0.2)
+                ? const Color(0xFF2F7E79).withValues(alpha: 0.2)
                 : (isDark ? Colors.white10 : const Color(0xFFF1F5F9)),
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF2F7E79).withOpacity(0.04),
+                    color: const Color(0xFF2F7E79).withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -346,7 +346,7 @@ Thank you for your payment!
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   width: 24,
                 ),
               ),
@@ -361,7 +361,7 @@ Thank you for your payment!
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   width: 28,
                 ),
               ),

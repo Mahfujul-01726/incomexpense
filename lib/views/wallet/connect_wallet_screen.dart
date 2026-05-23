@@ -183,7 +183,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.06),
+                            color: Colors.white.withValues(alpha: 0.06),
                             width: 18,
                           ),
                         ),
@@ -199,7 +199,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.06),
+                            color: Colors.white.withValues(alpha: 0.06),
                             width: 14,
                           ),
                         ),
@@ -245,7 +245,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Stack(
@@ -349,7 +349,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -412,7 +412,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF2F7E79).withOpacity(0.3),
+                          color: const Color(0xFF2F7E79).withValues(alpha: 0.3),
                           blurRadius: 15,
                           offset: const Offset(0, 8),
                         ),
@@ -430,7 +430,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.04),
+                                color: Colors.white.withValues(alpha: 0.04),
                                 width: 3,
                               ),
                             ),
@@ -445,7 +445,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.07),
+                                color: Colors.white.withValues(alpha: 0.07),
                                 width: 3,
                               ),
                             ),
@@ -460,7 +460,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 width: 3,
                               ),
                             ),
@@ -488,7 +488,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                                   Text(
                                     'Mono',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withValues(alpha: 0.9),
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       fontStyle: FontStyle.italic,
@@ -501,11 +501,11 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                                 width: 34,
                                 height: 24,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700).withOpacity(0.6),
+                                  color: const Color(0xFFFFD700).withValues(alpha: 0.6),
                                   borderRadius: BorderRadius.circular(4),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 2,
                                     )
                                   ],
@@ -747,7 +747,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
         : (isDark ? AppTheme.darkSurface : const Color(0xFFF8FAFC));
         
     final borderColor = isSelected 
-        ? const Color(0xFF2F7E79).withOpacity(0.4)
+        ? const Color(0xFF2F7E79).withValues(alpha: 0.4)
         : Colors.transparent;
         
     final iconBgColor = isSelected 
@@ -786,7 +786,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
           border: Border.all(color: borderColor, width: 1.5),
           boxShadow: isSelected ? [
             BoxShadow(
-              color: const Color(0xFF2F7E79).withOpacity(0.08),
+              color: const Color(0xFF2F7E79).withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -801,7 +801,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                 shape: BoxShape.circle,
                 boxShadow: isSelected ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   )
@@ -830,7 +830,7 @@ class _ConnectWalletScreenState extends State<ConnectWalletScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       color: isSelected
-                          ? const Color(0xFF2F7E79).withOpacity(0.7)
+                          ? const Color(0xFF2F7E79).withValues(alpha: 0.7)
                           : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                     ),
                   ),

@@ -62,7 +62,7 @@ class _WalletTabState extends State<WalletTab> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                     width: 24,
                   ),
                 ),
@@ -77,7 +77,7 @@ class _WalletTabState extends State<WalletTab> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                     width: 28,
                   ),
                 ),
@@ -136,7 +136,7 @@ class _WalletTabState extends State<WalletTab> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Stack(
@@ -301,7 +301,7 @@ class _WalletTabState extends State<WalletTab> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.05 : 0.02),
+                  color: Colors.black.withValues(alpha: isDark ? 0.05 : 0.02),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -365,7 +365,7 @@ class _WalletTabState extends State<WalletTab> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -605,7 +605,7 @@ class _WalletTabState extends State<WalletTab> {
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF2F7E79).withOpacity(0.2)
+                          ? const Color(0xFF2F7E79).withValues(alpha: 0.2)
                           : const Color(0xFFECF8F7),
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -833,7 +833,7 @@ class _WalletTabState extends State<WalletTab> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: selectedWalletIdForSend,
+                    initialValue: selectedWalletIdForSend,
                     dropdownColor: isDark ? AppTheme.darkSurface : Colors.white,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

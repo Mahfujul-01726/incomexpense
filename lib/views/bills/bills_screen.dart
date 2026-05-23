@@ -142,7 +142,7 @@ class _BillsScreenState extends State<BillsScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.01),
+              color: Colors.black.withValues(alpha: 0.01),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -210,7 +210,7 @@ class _BillsScreenState extends State<BillsScreen>
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withOpacity(0.1),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(
@@ -235,8 +235,8 @@ class _BillsScreenState extends State<BillsScreen>
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor.withOpacity(
-                          0.12,
+                        backgroundColor: AppTheme.primaryColor.withValues(
+                          alpha: 0.12,
                         ),
                         foregroundColor: AppTheme.primaryColor,
                         elevation: 0,
@@ -278,7 +278,7 @@ class _BillsScreenState extends State<BillsScreen>
                   ? Icons.history_rounded
                   : Icons.pending_actions_rounded,
               size: 56,
-              color: AppTheme.primaryColor.withOpacity(0.4),
+              color: AppTheme.primaryColor.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
@@ -327,7 +327,7 @@ class _BillsScreenState extends State<BillsScreen>
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -341,7 +341,7 @@ class _BillsScreenState extends State<BillsScreen>
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.1),
+        color: AppTheme.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
       ),
       child: const Icon(
@@ -400,7 +400,7 @@ class _BillsScreenState extends State<BillsScreen>
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: category,
+                    initialValue: category,
                     decoration: const InputDecoration(labelText: 'Category'),
                     items: const [
                       DropdownMenuItem(
@@ -436,7 +436,7 @@ class _BillsScreenState extends State<BillsScreen>
                       const Text('Auto-Pay bill'),
                       Switch(
                         value: autoPay,
-                        activeColor: AppTheme.primaryColor,
+                        activeThumbColor: AppTheme.primaryColor,
                         onChanged: (val) {
                           setDialogState(() {
                             autoPay = val;

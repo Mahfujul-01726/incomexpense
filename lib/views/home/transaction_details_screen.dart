@@ -61,7 +61,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   width: 24,
                 ),
               ),
@@ -76,7 +76,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   width: 28,
                 ),
               ),
@@ -326,7 +326,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.payment_outlined,
-            color: AppTheme.primaryColor.withOpacity(0.5),
+            color: AppTheme.primaryColor.withValues(alpha: 0.5),
             size: 24,
           ),
         ),
@@ -337,7 +337,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.1),
+        color: AppTheme.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(

@@ -39,7 +39,7 @@ class DashboardScreen extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryColor.withOpacity(0.35),
+                color: AppTheme.primaryColor.withValues(alpha: 0.35),
                 blurRadius: 15,
                 offset: const Offset(0, 7),
               )

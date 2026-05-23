@@ -238,7 +238,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.expenseColor.withOpacity(0.1),
+                  color: AppTheme.expenseColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.arrow_outward_rounded, color: AppTheme.expenseColor),
@@ -261,7 +261,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.incomeColor.withOpacity(0.1),
+                  color: AppTheme.incomeColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.call_received_rounded, color: AppTheme.incomeColor),
@@ -425,7 +425,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: activeColor.withOpacity(0.1),
+                            color: activeColor.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(Icons.add_card_rounded, color: activeColor, size: 20),
@@ -500,7 +500,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 Get.back();
                 Get.snackbar('Mock Attached', 'Simulated camera photo upload.',
                     snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppTheme.incomeColor.withOpacity(0.9),
+                    backgroundColor: AppTheme.incomeColor.withValues(alpha: 0.9),
                     colorText: Colors.white);
               },
             ),
@@ -514,7 +514,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 Get.back();
                 Get.snackbar('Mock Attached', 'Simulated PDF document upload.',
                     snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppTheme.incomeColor.withOpacity(0.9),
+                    backgroundColor: AppTheme.incomeColor.withValues(alpha: 0.9),
                     colorText: Colors.white);
               },
             ),
@@ -528,7 +528,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 Get.back();
                 Get.snackbar('Mock Attached', 'Simulated gallery upload.',
                     snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppTheme.incomeColor.withOpacity(0.9),
+                    backgroundColor: AppTheme.incomeColor.withValues(alpha: 0.9),
                     colorText: Colors.white);
               },
             ),
@@ -561,7 +561,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           colors: [
                             _selectedType == 'income' ? AppTheme.incomeColor : AppTheme.primaryColor,
                             _selectedType == 'income' 
-                                ? AppTheme.incomeColor.withOpacity(0.8) 
+                                ? AppTheme.incomeColor.withValues(alpha: 0.8) 
                                 : AppTheme.secondaryColor,
                           ],
                         ),
@@ -578,7 +578,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.08),
+                                  color: Colors.white.withValues(alpha: 0.08),
                                   width: 26,
                                 ),
                               ),
@@ -593,7 +593,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.08),
+                                  color: Colors.white.withValues(alpha: 0.08),
                                   width: 18,
                                 ),
                               ),
@@ -613,7 +613,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           )
@@ -972,7 +972,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 4,
               offset: const Offset(0, 2),
             )
@@ -998,7 +998,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             )
@@ -1022,7 +1022,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: (_selectedType == 'income' ? AppTheme.incomeColor : AppTheme.primaryColor).withOpacity(0.1),
+          color: (_selectedType == 'income' ? AppTheme.incomeColor : AppTheme.primaryColor).withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(

@@ -32,7 +32,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
                         ? Container(
                             width: 250,
                             height: 250,
-                            color: AppTheme.primaryColor.withOpacity(0.1),
+                            color: AppTheme.primaryColor.withValues(alpha: 0.1),
                             child: const Icon(
                               Icons.account_balance_wallet_outlined,
                               size: 80,
@@ -46,7 +46,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
                                 Container(
                               width: 250,
                               height: 250,
-                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
                               child: const Icon(
                                 Icons.account_balance_wallet_outlined,
                                 size: 80,
@@ -195,7 +195,7 @@ class _GoogleSignInButtonState extends State<_GoogleSignInButton>
             border: Border.all(color: Colors.grey.shade200, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -389,7 +389,7 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2F7E79).withOpacity(0.3),
+                color: const Color(0xFF2F7E79).withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),

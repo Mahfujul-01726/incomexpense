@@ -46,7 +46,7 @@ class HomeTab extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   width: 24,
                 ),
               ),
@@ -63,7 +63,7 @@ class HomeTab extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   width: 16,
                 ),
               ),
@@ -179,7 +179,7 @@ class HomeTab extends StatelessWidget {
               'Good afternoon,',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -199,7 +199,7 @@ class HomeTab extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Stack(
@@ -249,7 +249,7 @@ class HomeTab extends StatelessWidget {
           color: const Color(0xFF2F7E79),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF2F7E79).withOpacity(0.25),
+              color: const Color(0xFF2F7E79).withValues(alpha: 0.25),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -269,7 +269,7 @@ class HomeTab extends StatelessWidget {
                         Text(
                           'Total Balance',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -316,7 +316,7 @@ class HomeTab extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -332,7 +332,7 @@ class HomeTab extends StatelessWidget {
                         Text(
                           'Income',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 13,
                           ),
                         ),
@@ -355,7 +355,7 @@ class HomeTab extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -371,7 +371,7 @@ class HomeTab extends StatelessWidget {
                         Text(
                           'Expenses',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 13,
                           ),
                         ),
@@ -485,7 +485,7 @@ class HomeTab extends StatelessWidget {
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.payment_outlined,
-            color: AppTheme.primaryColor.withOpacity(0.5),
+            color: AppTheme.primaryColor.withValues(alpha: 0.5),
             size: 24,
           ),
         ),
@@ -496,7 +496,7 @@ class HomeTab extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.1),
+        color: AppTheme.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: const Icon(Icons.payment_outlined, color: AppTheme.primaryColor, size: 24),
@@ -685,7 +685,7 @@ class HomeTab extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.account_balance_wallet_outlined, size: 48, color: AppTheme.primaryColor.withOpacity(0.5)),
+          Icon(Icons.account_balance_wallet_outlined, size: 48, color: AppTheme.primaryColor.withValues(alpha: 0.5)),
           const SizedBox(height: 12),
           const Text(
             'No transactions yet',

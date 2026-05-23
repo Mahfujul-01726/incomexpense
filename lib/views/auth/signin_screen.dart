@@ -26,7 +26,7 @@ class SignInScreen extends StatelessWidget {
               height: 260,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF2F7E79).withOpacity(0.08),
+                color: const Color(0xFF2F7E79).withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -38,7 +38,7 @@ class SignInScreen extends StatelessWidget {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF2F7E79).withOpacity(0.05),
+                color: const Color(0xFF2F7E79).withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -50,7 +50,7 @@ class SignInScreen extends StatelessWidget {
               height: 180,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF2F7E79).withOpacity(0.06),
+                color: const Color(0xFF2F7E79).withValues(alpha: 0.06),
               ),
             ),
           ),
@@ -91,7 +91,7 @@ class SignInScreen extends StatelessWidget {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF2F7E79).withOpacity(0.3),
+                                color: const Color(0xFF2F7E79).withValues(alpha: 0.3),
                                 blurRadius: 22,
                                 offset: const Offset(0, 8),
                               ),
@@ -138,7 +138,7 @@ class SignInScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withValues(alpha: 0.05),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -207,7 +207,7 @@ class SignInScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
                                 color:
-                                    const Color(0xFF2F7E79).withOpacity(0.4),
+                                    const Color(0xFF2F7E79).withValues(alpha: 0.4),
                                 width: 1.5,
                               ),
                             ),
@@ -273,7 +273,7 @@ class _FeatureRow extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: const Color(0xFF2F7E79).withOpacity(0.10),
+            color: const Color(0xFF2F7E79).withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFF2F7E79), size: 22),
@@ -363,7 +363,7 @@ class _GoogleSignInButtonState extends State<_GoogleSignInButton>
             border: Border.all(color: Colors.grey.shade200, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.07),
+                color: Colors.black.withValues(alpha: 0.07),
                 blurRadius: 14,
                 offset: const Offset(0, 5),
               ),
