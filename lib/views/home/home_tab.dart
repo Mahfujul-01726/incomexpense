@@ -70,98 +70,110 @@ class HomeTab extends StatelessWidget {
             ),
           ),
 
-          // Scrollable Content
-          RefreshIndicator(
-            onRefresh: () async {
-              await walletController.loadWallets();
-              await txController.loadTransactions();
-            },
-            color: AppTheme.primaryColor,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
+          // Main Content Column (fixed top + scrollable bottom)
+          Column(
+            children: [
+              // Fixed top section (header + balance card)
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: statusBarHeight + 15),
-
-                    // Header Section
                     _buildHeader(context),
                     const SizedBox(height: 25),
-
-                    // Total Balance Card
                     _buildBalanceCard(context),
                     const SizedBox(height: 28),
-
-                    // Transactions History Title
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Transactions History',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF222222),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.find<NavigationController>().changeTab(1);
-                          },
-                          child: const Text(
-                            'See all',
-                            style: TextStyle(
-                              color: Color(0xFF666666),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Transactions List
-                    Obx(() {
-                      if (txController.isLoading.value) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                      if (txController.transactions.isEmpty) {
-                        return _buildEmptyState(context);
-                      }
-
-                      final displayTxs = txController.transactions.take(4).toList();
-
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: displayTxs.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 8),
-                        itemBuilder: (context, index) {
-                          final tx = displayTxs[index];
-                          return _buildTransactionItem(context, tx);
-                        },
-                      );
-                    }),
-
-                    const SizedBox(height: 25),
-
-                    // Send Again Section
-                    _buildSendAgainSection(context),
-
-                    // Padding at the bottom for safety
-                    const SizedBox(height: 100),
                   ],
                 ),
               ),
-            ),
+
+              // Scrollable bottom section (transactions + send again)
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await walletController.loadWallets();
+                    await txController.loadTransactions();
+                  },
+                  color: AppTheme.primaryColor,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Transactions History Title
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Transactions History',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF222222),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Get.find<NavigationController>().changeTab(1);
+                                },
+                                child: const Text(
+                                  'See all',
+                                  style: TextStyle(
+                                    color: Color(0xFF666666),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Transactions List
+                          Obx(() {
+                            if (txController.isLoading.value) {
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+                            if (txController.transactions.isEmpty) {
+                              return _buildEmptyState(context);
+                            }
+
+                            final displayTxs = txController.transactions.take(4).toList();
+
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: displayTxs.length,
+                              separatorBuilder: (context, index) => const SizedBox(height: 8),
+                              itemBuilder: (context, index) {
+                                final tx = displayTxs[index];
+                                return _buildTransactionItem(context, tx);
+                              },
+                            );
+                          }),
+
+                          const SizedBox(height: 25),
+
+                          // Send Again Section
+                          _buildSendAgainSection(context),
+
+                          // Padding at the bottom for safety
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

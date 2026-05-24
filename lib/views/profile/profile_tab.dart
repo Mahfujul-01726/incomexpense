@@ -17,315 +17,333 @@ class ProfileTab extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppTheme.darkBg : const Color(0xFFF8FAFC),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Teal Wavy Header with Avatar stacked
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                // Curved Header Background
-                ClipPath(
-                  clipper: ProfileHeaderWaveClipper(),
-                  child: Container(
-                    height: 240,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          AppTheme.primaryColor,
-                          AppTheme.secondaryColor,
-                        ],
-                      ),
+      body: Column(
+        children: [
+          // Fixed top section (header wave + avatar + name/handle)
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              // Curved Header Background
+              ClipPath(
+                clipper: ProfileHeaderWaveClipper(),
+                child: Container(
+                  height: 240,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
                     ),
-                    child: Stack(
-                      children: [
-                        // Decorative rings
-                        Positioned(
-                          top: -30,
-                          left: -30,
-                          child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.08),
-                                width: 22,
-                              ),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Decorative rings
+                      Positioned(
+                        top: -30,
+                        left: -30,
+                        child: Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              width: 22,
                             ),
                           ),
                         ),
-                        Positioned(
-                          right: -20,
-                          top: -10,
-                          child: Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.08),
-                                width: 16,
-                              ),
+                      ),
+                      Positioned(
+                        right: -20,
+                        top: -10,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              width: 16,
                             ),
                           ),
                         ),
-                        // App Bar row
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(16, statusBarHeight + 10, 16, 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_back_ios_new_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  try {
-                                    Get.find<NavigationController>().changeTab(0);
-                                  } catch (e) {
-                                    Get.back();
-                                  }
-                                },
+                      ),
+                      // App Bar row
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          statusBarHeight + 10,
+                          16,
+                          0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                color: Colors.white,
+                                size: 20,
                               ),
-                              const Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              onPressed: () {
+                                try {
+                                  Get.find<NavigationController>().changeTab(0);
+                                } catch (e) {
+                                  Get.back();
+                                }
+                              },
+                            ),
+                            const Text(
+                              'Profile',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              // Notification Icon inside translucent box
-                              GestureDetector(
-                                onTap: () {
-                                  Get.snackbar(
-                                    'Notifications',
-                                    'No new notifications.',
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    margin: const EdgeInsets.all(16),
-                                  );
-                                },
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.notifications_none_outlined,
-                                        color: Colors.white,
-                                        size: 22,
-                                      ),
-                                      Positioned(
-                                        right: 11,
-                                        top: 11,
-                                        child: Container(
-                                          width: 7,
-                                          height: 7,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFFFFC33A),
-                                            shape: BoxShape.circle,
-                                          ),
+                            ),
+                            // Notification Icon inside translucent box
+                            GestureDetector(
+                              onTap: () {
+                                Get.snackbar(
+                                  'Notifications',
+                                  'No new notifications.',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  margin: const EdgeInsets.all(16),
+                                );
+                              },
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.notifications_none_outlined,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                    Positioned(
+                                      right: 11,
+                                      top: 11,
+                                      child: Container(
+                                        width: 7,
+                                        height: 7,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFFFC33A),
+                                          shape: BoxShape.circle,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Overlapping Avatar
+                Positioned(
+                  bottom: -20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 48,
+                    backgroundColor: Colors.white,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(44),
+                      child: Image.asset(
+                        'assets/cropped/profile_icon.png',
+                        width: 92,
+                        height: 92,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-                // Overlapping Avatar
-                Positioned(
-                  bottom: -50,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 54,
-                      backgroundColor: Colors.white,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(50),
-                        child: Image.asset(
-                          'assets/cropped/profile_icon.png',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // User Name and Handle
+          Obx(() {
+            final nameVal = profileController.name.value;
+            final handle = '@${nameVal.toLowerCase().replaceAll(' ', '_')}';
+            return Column(
+              children: [
+                Text(
+                  nameVal,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF222222),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  handle,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF2F7E79),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 66),
+            );
+          }),
+          const SizedBox(height: 4),
 
-            // User Name and Handle
-            Obx(() {
-              final nameVal = profileController.name.value;
-              final handle = '@${nameVal.toLowerCase().replaceAll(' ', '_')}';
-              return Column(
-                children: [
-                  Text(
-                    nameVal,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF222222),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    handle,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF2F7E79),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              );
-            }),
-            const SizedBox(height: 28),
-
-            // Menu Options Container
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: isDark ? AppTheme.darkSurface : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+          // Scrollable bottom section (menu options)
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
                   children: [
-                    // Invite Friends
-                    _buildInviteFriendsRow(context),
-                    
-                    _buildDivider(),
-
-                    // Account info
-                    _buildMenuRow(
-                      context,
-                      title: 'Account info',
-                      icon: Icons.person_outline_rounded,
-                      onTap: () => _showEditProfileDialog(context),
-                    ),
-
-                    // Personal profile
-                    _buildMenuRow(
-                      context,
-                      title: 'Personal profile',
-                      icon: Icons.people_outline_rounded,
-                      onTap: () => _showPersonalProfileSheet(context),
-                    ),
-
-                    // Message center
-                    _buildMenuRow(
-                      context,
-                      title: 'Message center',
-                      icon: Icons.mail_outline_rounded,
-                      onTap: () {
-                        Get.snackbar(
-                          'Message Center',
-                          'Inbox is currently empty.',
-                          snackPosition: SnackPosition.BOTTOM,
-                          margin: const EdgeInsets.all(16),
-                        );
-                      },
-                    ),
-
-                    // Login and security
-                    _buildMenuRow(
-                      context,
-                      title: 'Login and security',
-                      icon: Icons.shield_outlined,
-                      onTap: () => _showSecuritySheet(context),
-                    ),
-
-                    // Data and privacy
-                    _buildMenuRow(
-                      context,
-                      title: 'Data and privacy',
-                      icon: Icons.lock_outline_rounded,
-                      onTap: () => _showDataPrivacySheet(context),
-                    ),
-
-                    // Sign Out
-                    _buildMenuRow(
-                      context,
-                      title: 'Sign Out',
-                      icon: Icons.logout_rounded,
-                      iconColor: AppTheme.expenseColor,
-                      textColor: AppTheme.expenseColor,
-                      onTap: () {
-                        Get.dialog(
-                          AlertDialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            title: const Text('Sign Out',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            content: const Text(
-                                'Are you sure you want to sign out?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Get.back(),
-                                child: const Text('Cancel'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Get.back();
-                                  Get.find<AuthController>().signOut();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.expenseColor,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                ),
-                                child: const Text('Sign Out'),
-                              ),
-                            ],
+                    // Menu Options Container
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppTheme.darkSurface : Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
-                        );
-                      },
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          // Invite Friends
+                          _buildInviteFriendsRow(context),
+
+                          _buildDivider(),
+
+                          // Account info
+                          _buildMenuRow(
+                            context,
+                            title: 'Account info',
+                            icon: Icons.person_outline_rounded,
+                            onTap: () => _showEditProfileDialog(context),
+                          ),
+
+                          // Personal profile
+                          _buildMenuRow(
+                            context,
+                            title: 'Personal profile',
+                            icon: Icons.people_outline_rounded,
+                            onTap: () => _showPersonalProfileSheet(context),
+                          ),
+
+                          // Message center
+                          _buildMenuRow(
+                            context,
+                            title: 'Message center',
+                            icon: Icons.mail_outline_rounded,
+                            onTap: () {
+                              Get.snackbar(
+                                'Message Center',
+                                'Inbox is currently empty.',
+                                snackPosition: SnackPosition.BOTTOM,
+                                margin: const EdgeInsets.all(16),
+                              );
+                            },
+                          ),
+
+                          // Login and security
+                          _buildMenuRow(
+                            context,
+                            title: 'Login and security',
+                            icon: Icons.shield_outlined,
+                            onTap: () => _showSecuritySheet(context),
+                          ),
+
+                          // Data and privacy
+                          _buildMenuRow(
+                            context,
+                            title: 'Data and privacy',
+                            icon: Icons.lock_outline_rounded,
+                            onTap: () => _showDataPrivacySheet(context),
+                          ),
+
+                          // Sign Out
+                          _buildMenuRow(
+                            context,
+                            title: 'Sign Out',
+                            icon: Icons.logout_rounded,
+                            iconColor: AppTheme.expenseColor,
+                            textColor: AppTheme.expenseColor,
+                            onTap: () {
+                              Get.dialog(
+                                AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  title: const Text(
+                                    'Sign Out',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  content: const Text(
+                                    'Are you sure you want to sign out?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Get.back(),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Get.back();
+                                        Get.find<AuthController>().signOut();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppTheme.expenseColor,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text('Sign Out'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 100), // safety spacing
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 100), // safety spacing
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -355,7 +373,7 @@ class ProfileTab extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.diamond_rounded, 
+                Icons.diamond_rounded,
                 color: Color(0xFF2F7E79), // teal gem icon
                 size: 24,
               ),
@@ -386,7 +404,9 @@ class ProfileTab extends StatelessWidget {
     Color? textColor,
   }) {
     final isDark = Get.isDarkMode;
-    final defaultIconColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final defaultIconColor = isDark
+        ? const Color(0xFF94A3B8)
+        : const Color(0xFF64748B);
     final defaultTextColor = isDark ? Colors.white : const Color(0xFF222222);
 
     return InkWell(
@@ -395,11 +415,7 @@ class ProfileTab extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: iconColor ?? defaultIconColor,
-              size: 24,
-            ),
+            Icon(icon, color: iconColor ?? defaultIconColor, size: 24),
             const SizedBox(width: 20),
             Expanded(
               child: Text(
@@ -449,23 +465,27 @@ class ProfileTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Obx(() => _buildSwitchRow(
-              context,
-              title: 'Dark Theme',
-              icon: Icons.dark_mode_outlined,
-              iconColor: Colors.purple,
-              value: profileController.isDarkTheme.value,
-              onChanged: (val) => profileController.toggleTheme(),
-            )),
+            Obx(
+              () => _buildSwitchRow(
+                context,
+                title: 'Dark Theme',
+                icon: Icons.dark_mode_outlined,
+                iconColor: Colors.purple,
+                value: profileController.isDarkTheme.value,
+                onChanged: (val) => profileController.toggleTheme(),
+              ),
+            ),
             _buildDivider(),
-            Obx(() => _buildSwitchRow(
-              context,
-              title: 'Receive Notifications',
-              icon: Icons.notifications_active_outlined,
-              iconColor: Colors.blue,
-              value: profileController.receiveNotifications.value,
-              onChanged: (val) => profileController.toggleNotifications(),
-            )),
+            Obx(
+              () => _buildSwitchRow(
+                context,
+                title: 'Receive Notifications',
+                icon: Icons.notifications_active_outlined,
+                iconColor: Colors.blue,
+                value: profileController.receiveNotifications.value,
+                onChanged: (val) => profileController.toggleNotifications(),
+              ),
+            ),
             const SizedBox(height: 20),
           ],
         ),
@@ -495,14 +515,16 @@ class ProfileTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Obx(() => _buildSwitchRow(
-              context,
-              title: 'Fingerprint Lock',
-              icon: Icons.fingerprint_rounded,
-              iconColor: Colors.green,
-              value: profileController.biometricsEnabled.value,
-              onChanged: (val) => profileController.toggleBiometrics(),
-            )),
+            Obx(
+              () => _buildSwitchRow(
+                context,
+                title: 'Fingerprint Lock',
+                icon: Icons.fingerprint_rounded,
+                iconColor: Colors.green,
+                value: profileController.biometricsEnabled.value,
+                onChanged: (val) => profileController.toggleBiometrics(),
+              ),
+            ),
             const SizedBox(height: 20),
           ],
         ),
@@ -645,7 +667,9 @@ class ProfileTab extends StatelessWidget {
                     desc,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
                     ),
                   ),
                 ],
@@ -664,8 +688,12 @@ class ProfileTab extends StatelessWidget {
 
   void _showEditProfileDialog(BuildContext context) {
     final nameField = TextEditingController(text: profileController.name.value);
-    final emailField = TextEditingController(text: profileController.email.value);
-    final phoneField = TextEditingController(text: profileController.phone.value);
+    final emailField = TextEditingController(
+      text: profileController.email.value,
+    );
+    final phoneField = TextEditingController(
+      text: profileController.phone.value,
+    );
     final isDark = Get.isDarkMode;
 
     Get.dialog(
@@ -688,9 +716,15 @@ class ProfileTab extends StatelessWidget {
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   labelText: 'Name',
-                  labelStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  labelStyle: TextStyle(
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                    borderSide: BorderSide(
+                      color: isDark ? Colors.white24 : Colors.black12,
+                    ),
                   ),
                   focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: AppTheme.primaryColor),
@@ -703,9 +737,15 @@ class ProfileTab extends StatelessWidget {
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  labelStyle: TextStyle(
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                    borderSide: BorderSide(
+                      color: isDark ? Colors.white24 : Colors.black12,
+                    ),
                   ),
                   focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: AppTheme.primaryColor),
@@ -718,9 +758,15 @@ class ProfileTab extends StatelessWidget {
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   labelText: 'Phone',
-                  labelStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  labelStyle: TextStyle(
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                    borderSide: BorderSide(
+                      color: isDark ? Colors.white24 : Colors.black12,
+                    ),
                   ),
                   focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: AppTheme.primaryColor),
@@ -733,7 +779,10 @@ class ProfileTab extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.expenseColor)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppTheme.expenseColor),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -755,7 +804,9 @@ class ProfileTab extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: const Text('Save'),
           ),
