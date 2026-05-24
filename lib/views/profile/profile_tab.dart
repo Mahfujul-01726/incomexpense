@@ -151,8 +151,8 @@ class ProfileTab extends StatelessWidget {
                 ),
               ),
               // Overlapping Avatar
-                Positioned(
-                  bottom: -20,
+              Positioned(
+                bottom: -20,
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
