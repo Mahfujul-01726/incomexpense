@@ -3,13 +3,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:incomexpense/controllers/onboarding_controller.dart';
-import 'package:incomexpense/views/onboarding/onboarding_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:incomexpense/services/preferences_service.dart';
+import 'package:incomexpense/pages/onboarding/onboarding_controller.dart';
+import 'package:incomexpense/pages/onboarding/onboarding_view.dart';
 
 void main() {
   testWidgets('OnboardingScreen renders slides and controls', (WidgetTester tester) async {
-    // Mock SharedPreferences
+    // Mock SharedPreferences and FlutterSecureStorage
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
+
+    // Inject PreferencesService first
+    Get.put(PreferencesService());
 
     // Inject controller
     Get.put(OnboardingController());

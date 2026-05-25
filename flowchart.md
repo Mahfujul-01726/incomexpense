@@ -17,57 +17,97 @@ incomexpense/                    ← THE PROJECT (the whole app)
 │   ├── main.dart                ← ENTRY POINT (app starts here)
 │   │
 │   ├── theme/                   ← COLORS & STYLES
-│   │   └── app_theme.dart       ← defines teal color, fonts, light/dark mode
+│   │   └── app_theme.dart       ← defines teal color, fonts, light/dark mode, card gradients
 │   │
-│   ├── services/                ← EXTERNAL HELPERS
-│   │   └── auth_service.dart    ← talks to Firebase & Google for login
+│   ├── constants/               ← CENTRALIZED CONSTANTS
+│   │   ├── app_constants.dart   ← route paths, SharedPreferences keys, default values, type constants
+│   │   └── image_assets.dart    ← all image asset paths in one place
 │   │
 │   ├── models/                  ← DATA SHAPES (blueprints for data)
 │   │   ├── transaction_model.dart   ← what a transaction looks like
 │   │   ├── wallet_model.dart        ← what a wallet looks like
 │   │   └── bill_model.dart          ← what a bill looks like
 │   │
-│   ├── controllers/             ← BRAINS (logic & data management)
-│   │   ├── auth_controller.dart         ← login/logout logic
-│   │   ├── transaction_controller.dart  ← add/delete transactions
-│   │   ├── wallet_controller.dart       ← add wallets, update balance
-│   │   ├── bill_controller.dart         ← manage bills, pay bills
-│   │   ├── profile_controller.dart      ← user name, theme, settings
-│   │   └── onboarding_controller.dart   ← tracks onboarding slides
+│   ├── data/                    ← DEFAULT/SEED DATA
+│   │   └── mock_data.dart       ← starter transactions, wallets & bills
 │   │
-│   └── views/                   ← SCREENS (what user sees & taps)
-│       ├── splash_screen.dart              ← first screen (logo animation)
-│       ├── dashboard_screen.dart           ← main screen with 4 tabs
-│       ├── onboarding/                     ← intro screens
-│       │   └── onboarding_screen.dart
-│       ├── auth/                           ← login screen
-│       │   └── signin_screen.dart
-│       ├── home/                           ← home tab
-│       │   ├── home_tab.dart               ← balance + transactions
-│       │   └── transaction_details_screen.dart  ← receipt view
-│       ├── statistics/                     ← charts tab
-│       │   └── statistics_tab.dart
-│       ├── wallet/                         ← wallet tab
-│       │   ├── wallet_tab.dart             ← cards & bills
-│       │   ├── connect_wallet_screen.dart  ← add card/bank form
-│       │   └── qr_scanner_screen.dart      ← scan QR
-│       ├── profile/                        ← profile tab
-│       │   └── profile_tab.dart
-│       ├── bills/                          ← bills screens
-│       │   ├── bills_screen.dart           ← list of bills
-│       │   ├── bill_details_screen.dart    ← bill receipt
-│       │   └── bill_payment_screen.dart    ← 3-step payment wizard
-│       ├── add_transaction/                ← add transaction form
-│       │   └── add_transaction_screen.dart
-│       └── widgets/                        ← reusable UI pieces
-│           └── app_bottom_nav.dart         ← bottom navigation bar
+│   ├── services/                ← EXTERNAL HELPERS & PERSISTENCE
+│   │   ├── auth_service.dart         ← talks to Firebase & Google for login
+│   │   └── preferences_service.dart  ← reads/writes all data via SharedPreferences + FlutterSecureStorage
+│   │
+│   ├── bindings/                ← GETX LAZY-LOADING SETUP
+│   │   ├── dashboard_binding.dart    ← registers Navigation, Wallet, Transaction, Profile controllers
+│   │   ├── bills_binding.dart        ← registers BillController
+│   │   └── onboarding_binding.dart   ← registers OnboardingController
+│   │
+│   ├── routes/                  ← ROUTE DEFINITIONS
+│   │   ├── routes.dart          ← route string constants
+│   │   └── pages.dart           ← GetPage list with bindings attached
+│   │
+│   ├── pages/                   ← ALL SCREENS — each feature has its own folder
+│   │   ├── splash/              ← splash screen
+│   │   │   ├── splash_view.dart           ← UI (fade-in logo)
+│   │   │   └── splash_controller.dart     ← animation + nav logic
+│   │   │
+│   │   ├── onboarding/          ← intro screen
+│   │   │   ├── onboarding_view.dart       ← big illustration + "Get Started" button
+│   │   │   └── onboarding_controller.dart ← finish / skip logic
+│   │   │
+│   │   ├── auth/                ← authentication
+│   │   │   ├── auth_controller.dart       ← Google sign-in / sign-out logic
+│   │   │   └── signin/
+│   │   │       └── signin_view.dart       ← Google button + guest mode
+│   │   │
+│   │   ├── dashboard/           ← main shell with 4 tabs
+│   │   │   ├── dashboard_view.dart        ← IndexedStack + FAB + bottom nav
+│   │   │   └── navigation_controller.dart ← tab index state
+│   │   │
+│   │   ├── home/                ← home tab (tab 0)
+│   │   │   ├── home_tab.dart              ← balance card + transaction list
+│   │   │   ├── transaction_controller.dart← CRUD transactions + totals + filtering
+│   │   │   └── transaction_details_view.dart ← receipt-style detail screen
+│   │   │
+│   │   ├── statistics/          ← statistics tab (tab 1)
+│   │   │   └── statistics_tab.dart        ← line chart + top spending
+│   │   │
+│   │   ├── wallet/              ← wallet tab (tab 2)
+│   │   │   ├── wallet_tab.dart            ← cards, send/pay actions, bills list
+│   │   │   ├── wallet_controller.dart     ← CRUD wallets + balance update
+│   │   │   ├── connect_wallet_view.dart   ← add card/bank form with live preview
+│   │   │   └── qr_scanner_view.dart       ← camera QR scanner
+│   │   │
+│   │   ├── profile/             ← profile tab (tab 3)
+│   │   │   ├── profile_tab.dart           ← avatar, menu, edit dialog, sign-out
+│   │   │   └── profile_controller.dart    ← name, theme, notifications, biometrics
+│   │   │
+│   │   ├── bills/               ← bill management
+│   │   │   ├── bills_view.dart            ← upcoming + paid tabs
+│   │   │   ├── bill_controller.dart       ← CRUD bills + pay bill
+│   │   │   ├── bill_details_view.dart     ← invoice layout + pay now
+│   │   │   └── bill_payment_view.dart     ← 3-step payment wizard
+│   │   │
+│   │   └── add_transaction/     ← add income/expense
+│   │       └── add_transaction_view.dart  ← merchant picker, amount, date, wallet, etc.
+│   │
+│   ├── utils/                   ← HELPER FUNCTIONS
+│   │   ├── date_helpers.dart    ← "Today" / "Yesterday" / date formatting
+│   │   ├── calculations.dart    ← fee calculation (2.9% + $0.30)
+│   │   └── logo_helpers.dart    ← maps names to logo asset paths
+│   │
+│   └── widgets/                 ← REUSABLE UI PIECES
+│       ├── app_bottom_nav.dart         ← 4-tab bottom navigation bar
+│       ├── bill_logo_widget.dart       ← bill provider logo resolver
+│       ├── transaction_logo_widget.dart← merchant logo with fallback icons
+│       ├── payment_option_card.dart    ← payment method cards + logos
+│       ├── header_wave_clipper.dart    ← CustomClipper for teal curved headers
+│       └── dashed_border_painter.dart  ← dashed border for invoice area
 ```
 
 ---
 
 ## What does "import" mean?
 
-When a file says `import 'controllers/auth_controller.dart'`, it means:
+When a file says `import '../pages/auth/auth_controller.dart'`, it means:
 > "Hey, I need to use the code from `auth_controller.dart` file"
 
 Think of it like saying "I need the hammer from the toolbox" before you can use it.
@@ -140,43 +180,61 @@ isLoading.value = true;         // ← this also triggers Obx
 │      // Start Firebase (needed for Google login)                 │
 │      await Firebase.initializeApp();                             │
 │                                                                  │
-│      // Open phone's storage to check settings                  │
-│      final prefs = await SharedPreferences.getInstance();        │
-│      final onboardingCompleted =                                 │
-│          prefs.getBool('onboarding_completed') ?? false;         │
+│      // Create the storage service (GetxService, async init)    │
+│      await Get.putAsync(() => PreferencesService().init());     │
+│      //      ↑ This creates PreferencesService which sets up    │
+│      //        SharedPreferences + FlutterSecureStorage         │
+│      //        and migrates any old plain-text data             │
 │                                                                  │
-│      // Create all 6 controllers (THE BRAINS)                   │
-│      // Now they exist in memory and any file can access them    │
+│      // Create AuthController (the ONLY eager controller)       │
 │      Get.put(AuthController());          ← login logic           │
-│      Get.put(ProfileController());       ← user settings         │
-│      Get.put(WalletController());        ← wallet management     │
-│      Get.put(TransactionController());   ← transaction logic     │
-│      Get.put(BillController());          ← bill logic            │
-│      Get.put(OnboardingController());    ← intro slides          │
-│      Get.put(NavigationController());    ← tab switching         │
+│      //      ↑ All other controllers are lazy-loaded            │
+│      //        via Get.lazyPut in bindings (see below)          │
 │                                                                  │
-│      // Start the app with the splash screen                     │
-│      runApp(MyApp(onboardingCompleted: onboardingCompleted));    │
+│      // Start the app                                           │
+│      runApp(const MyApp());                                     │
 │    }                                                             │
 │                                                                  │
 │    MyApp builds:                                                 │
 │      GetMaterialApp(                                             │
 │        theme: AppTheme.lightTheme,       ← teal colors           │
-│        darkTheme: AppTheme.darkTheme,    ← dark colors           │
-│        initialRoute: '/splash',          ← start here            │
-│        getPages: [                                               │
-│          '/splash'      → SplashScreen(),                        │
-│          '/onboarding'  → OnboardingScreen(),                    │
-│          '/signin'      → SignInScreen(),                        │
-│          '/dashboard'   → DashboardScreen(),                     │
-│        ],                                                        │
+│        themeMode: ThemeMode.light,        ← light by default     │
+│        initialRoute: Routes.splash,       ← start here           │
+│        getPages: Pages.pages,             ← routes with bindings │
+│          // Routes defined in routes/pages.dart:                 │
+│          //   '/splash'      → SplashScreen                      │
+│          //   '/onboarding'  → OnboardingScreen (OnboardingBinding)
+│          //   '/signin'      → SignInScreen                      │
+│          //   '/dashboard'   → DashboardScreen (DashboardBinding)
+│          //   '/bills'       → BillsScreen (BillsBinding)        │
 │      )                                                           │
+│                                                                  │
+│ ─── HOW CONTROLLERS GET CREATED (via Bindings) ───             │
+│                                                                  │
+│  DashboardBinding (runs when user visits /dashboard):           │
+│    Get.put(NavigationController());      ← tab switching        │
+│    Get.lazyPut(() => WalletController(), fenix: true);          │
+│    Get.lazyPut(() => TransactionController(), fenix: true);     │
+│    Get.lazyPut(() => ProfileController(), fenix: true);         │
+│                                                                  │
+│  BillsBinding (runs when user visits /bills):                   │
+│    Get.lazyPut(() => BillController(), fenix: true);            │
+│                                                                  │
+│  OnboardingBinding (runs when user visits /onboarding):         │
+│    Get.lazyPut(() => OnboardingController(), fenix: true);      │
+│                                                                  │
+│  What does "fenix: true" mean?                                   │
+│    If the controller is ever destroyed (e.g. user leaves page), │
+│    it will be re-created automatically when needed again.        │
+│                                                                  │
+│  Why lazy? Controllers are only created when first needed,       │
+│  saving memory at startup.                                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ## PHASE 2: SPLASH SCREEN
 
-### File: `views/splash_screen.dart`
+### Files: `pages/splash/splash_view.dart` + `pages/splash/splash_controller.dart`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -184,13 +242,26 @@ isLoading.value = true;         // ← this also triggers Obx
 │                                                                  │
 │ Code that runs:                                                  │
 │                                                                  │
-│ class _SplashScreenState {                                      │
+│ SplashView uses GetBuilder<SplashController>:                   │
+│   init: SplashController()      ← created locally, not global   │
+│                                                                  │
+│ SplashController (extends GetxController                        │
+│                  with GetSingleTickerProviderStateMixin):        │
+│                                                                  │
 │   @override                                                     │
-│   void initState() {                                            │
+│   void onInit() {                                               │
 │     // Start fade-in animation (1200ms)                          │
-│     _animationController.forward();                              │
+│     _initializeAnimations();                                     │
 │     // Wait 2.5 seconds, then decide where to go                 │
 │     _navigateToNext();                                           │
+│   }                                                              │
+│                                                                  │
+│   void _initializeAnimations() {                                │
+│     animationController = AnimationController(                   │
+│       duration: Duration(milliseconds: 1200),                   │
+│     );                                                           │
+│     fadeAnimation = CurvedAnimation(parent: ..., curve: easeIn); │
+│     animationController.forward();                               │
 │   }                                                              │
 │                                                                  │
 │   Future<void> _navigateToNext() async {                        │
@@ -200,24 +271,23 @@ isLoading.value = true;         // ← this also triggers Obx
 │     final firebaseUser = FirebaseAuth.instance.currentUser;      │
 │     if (firebaseUser != null) {                                 │
 │       // YES → go straight to dashboard                          │
-│       Get.offAllNamed('/dashboard');                             │
+│       Get.offAllNamed(Routes.dashboard);                         │
 │       return;                                                    │
 │     }                                                            │
 │                                                                  │
 │     // DECISION 2: Has user completed onboarding before?         │
-│     final prefs = await SharedPreferences.getInstance();         │
+│     final prefsService = Get.find<PreferencesService>();         │
 │     final onboardingCompleted =                                  │
-│         prefs.getBool('onboarding_completed') ?? false;          │
+│         await prefsService.getOnboardingCompleted();             │
 │                                                                  │
 │     if (onboardingCompleted) {                                   │
 │       // YES → go to dashboard (guest mode)                      │
-│       Get.offAllNamed('/dashboard');                             │
+│       Get.offAllNamed(Routes.dashboard);                         │
 │     } else {                                                     │
-│       // NO → show onboarding slides                             │
-│       Get.offAllNamed('/onboarding');                            │
+│       // NO → show onboarding screen                             │
+│       Get.offAllNamed(Routes.onboarding);                        │
 │     }                                                            │
 │   }                                                              │
-│ }                                                                │
 │                                                                  │
 │ FLOWCHART:                                                       │
 │                                                                  │
@@ -242,50 +312,44 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## PHASE 3: ONBOARDING SCREEN
 
-### File: `views/onboarding/onboarding_screen.dart`
-### Controller: `controllers/onboarding_controller.dart`
+### Files: `pages/onboarding/onboarding_view.dart` + `pages/onboarding/onboarding_controller.dart`
+### Binding: `bindings/onboarding_binding.dart` (lazy-loads OnboardingController)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ What user sees:                                                 │
-│   - Illustration image at top                                   │
-│   - "Spend Smarter Save More" text                             │
-│   - "Get Started" teal gradient button                          │
+│   - Illustration guy image at top (62% of screen height)        │
+│   - Teal-ish background behind illustration                     │
+│   - "Spend Smarter Save More" text (32px, dark teal, bold)     │
+│   - "Get Started" teal gradient button with animated scale      │
 │   - "Already Have Account? Log In" link                         │
 │                                                                  │
-│ Controller's data:                                               │
+│ Controller's code:                                               │
 │   OnboardingController {                                         │
-│     currentPage = 0  (which slide, 0-indexed)                   │
-│     pageController = PageController()                            │
 │                                                                  │
-│     onboardingData = [                                           │
-│       {title, description, image} for slide 1,                   │
-│       {title, description, image} for slide 2,                   │
-│       {title, description, image} for slide 3,                   │
-│     ]                                                            │
-│                                                                  │
-│     // Goes to next slide or finishes if on last                 │
-│     nextPage() {                                                 │
-│       if currentPage < 2 → pageController.nextPage()             │
-│       else → completeOnboarding()                                │
-│     }                                                            │
+│     // Uses PreferencesService (GetxService) for storage         │
+│     final _prefsService = Get.find<PreferencesService>();        │
 │                                                                  │
 │     // Called by "Get Started" button                            │
 │     completeOnboarding() {                                       │
-│       Get.toNamed('/signin');  ← go to Sign In screen            │
+│       Get.toNamed(Routes.signin);  ← go to Sign In screen        │
 │     }                                                            │
 │                                                                  │
-│     // Called after successful login                             │
+│     // Called from AuthController after successful login,        │
+│     // or from SignInScreen "Continue as Guest" tap              │
 │     finishOnboarding() async {                                   │
-│       prefs.setBool('onboarding_completed', true);               │
-│       Get.offAllNamed('/dashboard');                             │
+│       await _prefsService.setOnboardingCompleted(true);          │
+│       Get.offAllNamed(Routes.dashboard);                         │
 │     }                                                            │
 │   }                                                              │
+│                                                                  │
+│ NOTE: This is NOT a slideshow. Just a single landing page.       │
+│ No PageView, no swipeable slides.                                │
 │                                                                  │
 │ USER TAPS:                                                       │
 │                                                                  │
 │  "Get Started" button → completeOnboarding() → /signin          │
-│  "Log In" link       → Get.toNamed('/signin')                   │
+│  "Log In" link       → Get.toNamed(Routes.signin)               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -293,8 +357,7 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## PHASE 4: SIGN IN SCREEN
 
-### File: `views/auth/signin_screen.dart`
-### Controller: `controllers/auth_controller.dart` & `controllers/onboarding_controller.dart`
+### Files: `pages/auth/signin/signin_view.dart` + `pages/auth/auth_controller.dart`
 ### Service: `services/auth_service.dart`
 
 ```
@@ -303,11 +366,17 @@ isLoading.value = true;         // ← this also triggers Obx
 │   - Back button (top-left)                                      │
 │   - App icon (wallet icon)                                      │
 │   - "Welcome!" text                                             │
-│   - 3 feature rows (Smart Analytics, Multi-Wallet, Cloud Sync)  │
-│   - "Continue with Google" button (white with Google logo)      │
+│   - 3 feature highlight cards (Smart Analytics, Multi-Wallet,   │
+│     Cloud Sync) with press animations                           │
+│   - "Continue with Google" button with custom Google G painter  │
 │   - "or" divider                                               │
 │   - "Continue as Guest" button (outlined teal)                  │
 │   - Terms of Service text                                       │
+│                                                                  │
+│ AuthController:                                                  │
+│   - Created once at startup in main.dart via Get.put()          │
+│   - Binds Firebase auth state stream to `user` Rx on init:      │
+│     user.bindStream(_authService.authStateChanges)              │
 │                                                                  │
 │ ─── GOOGLE SIGN-IN PATH ───                                    │
 │                                                                  │
@@ -323,9 +392,12 @@ isLoading.value = true;         // ← this also triggers Obx
 │   │   final signedInUser = await _authService              │     │
 │   │       .signInWithGoogle();                             │     │
 │   │                                                        │     │
-│   │   // STEP 2: If login succeeded, go to dashboard       │     │
+│   │   // STEP 2: If login succeeded, save onboarding flag  │     │
+│   │   // and go to dashboard directly                      │     │
 │   │   if (signedInUser != null) {                         │     │
-│   │     Get.find<OnboardingController>().finishOnboarding();│     │
+│   │     final prefsService = Get.find<PreferencesService>();│     │
+│   │     await prefsService.setOnboardingCompleted(true);   │     │
+│   │     Get.offAllNamed(Routes.dashboard);                  │     │
 │   │   }                                                    │     │
 │   │                                                        │     │
 │   │   isLoading.value = false;                             │     │
@@ -356,16 +428,17 @@ isLoading.value = true;         // ← this also triggers Obx
 │   │ }                                                      │     │
 │   └───────────────────────────────────────────────────────┘     │
 │                                                                  │
-│   After login: OnboardingController.finishOnboarding()         │
-│     → saves "onboarding_completed = true" to phone storage      │
-│     → Get.offAllNamed('/dashboard')  ← goes to main app        │
+│   After login: AuthController directly calls:                   │
+│     → prefsService.setOnboardingCompleted(true)                 │
+│     → Get.offAllNamed(Routes.dashboard)                         │
+│   (Does NOT delegate to OnboardingController anymore)           │
 │                                                                  │
 │ ─── GUEST MODE PATH ───                                        │
 │                                                                  │
 │ User taps "Continue as Guest" →                                 │
-│   onboardingController.finishOnboarding()                        │
-│     → saves "onboarding_completed = true"                        │
-│     → Get.offAllNamed('/dashboard')                             │
+│   OnboardingController.finishOnboarding() (from signin_view)    │
+│     → calls _prefsService.setOnboardingCompleted(true)           │
+│     → Get.offAllNamed(Routes.dashboard)                         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -373,20 +446,21 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## PHASE 5: DASHBOARD (Main App Screen)
 
-### File: `views/dashboard_screen.dart`
+### File: `pages/dashboard/dashboard_view.dart`
+### Controller: `pages/dashboard/navigation_controller.dart`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ What user sees:                                                 │
 │   - One of 4 tabs shown in the middle                           │
-│   - "+" floating button at bottom-center                        │
+│   - "+" floating action button at bottom-center (teal, glow)    │
 │   - Bottom navigation bar with 4 icons                          │
 │     [Home] [Statistics] [Wallet] [Profile]                      │
 │                                                                  │
 │ Code:                                                            │
 │                                                                  │
 │ class DashboardScreen {                                          │
-│   // Get/create the NavigationController that tracks tabs        │
+│   // Get the NavigationController (created by DashboardBinding) │
 │   final navController = Get.find<NavigationController>();        │
 │                                                                  │
 │   // The 4 tab screens                                            │
@@ -403,18 +477,21 @@ isLoading.value = true;         // ← this also triggers Obx
 │           children: _tabs,                                       │
 │         ),                                                       │
 │                                                                  │
-│         floatingActionButton: "+" button →                       │
+│         floatingActionButton: teal circular button →             │
 │           Get.to(() => AddTransactionScreen()),                  │
 │                                                                  │
-│         bottomNavigationBar: AppBottomNav()  ← the 4 icons      │
+│         bottomNavigationBar: AppBottomNav()  ← the 4 icons in   │
 │       )                                                          │
 │     })                                                           │
 │   }                                                              │
 │ }                                                                │
 │                                                                  │
-│ NavigationController (defined in home_tab.dart):                 │
-│   selectedIndex = 0.obs   // 0=Home, 1=Stats, 2=Wallet, 3=Profile
-│   changeTab(index) → selectedIndex.value = index                 │
+│ NavigationController (pages/dashboard/navigation_controller.dart)│
+│   class NavigationController extends GetxController {            │
+│     var selectedIndex = 0.obs;  // 0=Home, 1=Stats, 2=Wallet,   │
+│                                 // 3=Profile                     │
+│     void changeTab(int index) => selectedIndex.value = index;    │
+│   }                                                              │
 │                                                                  │
 │ HOW TABS WORK:                                                   │
 │   User taps "Statistics" icon →                                  │
@@ -430,7 +507,7 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## TAB 0: HOME TAB
 
-### File: `views/home/home_tab.dart`
+### File: `pages/home/home_tab.dart`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -490,17 +567,15 @@ isLoading.value = true;         // ← this also triggers Obx
 │                                                                  │
 │   _buildTransactionItem(tx) →                                     │
 │     shows logo (from assets/cropped/), title, date, amount       │
-│     onTap → Get.to(TransactionDetailsScreen(transaction: tx))   │
+│     onTap → Get.to(TransactionDetailsScreen(transaction: tx))
+    // TransactionDetailsScreen: pages/home/transaction_details_view.dart   │
 │                                                                  │
 │   _buildSendAgainSection() →                                     │
 │     shows 5 avatar images, "See all" opens bottom sheet          │
 │ }                                                                 │
-│                                                                  │
-│ ALSO IN THIS FILE: NavigationController                          │
-│   class NavigationController extends GetxController {             │
-│     var selectedIndex = 0.obs;                                    │
-│     void changeTab(int index) => selectedIndex.value = index;    │
-│   }                                                               │
+ │                                                                  │
+│ NOTE: NavigationController is in a separate file:                │
+│   pages/dashboard/navigation_controller.dart                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -508,7 +583,7 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## TAB 1: STATISTICS TAB
 
-### File: `views/statistics/statistics_tab.dart`
+### File: `pages/statistics/statistics_tab.dart`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -574,7 +649,8 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## TAB 2: WALLET TAB
 
-### File: `views/wallet/wallet_tab.dart`
+### File: `pages/wallet/wallet_tab.dart`
+### Controllers: `pages/wallet/wallet_controller.dart`, `pages/home/transaction_controller.dart`, `pages/bills/bill_controller.dart`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -603,10 +679,10 @@ isLoading.value = true;         // ← this also triggers Obx
 │  If Upcoming Bills tab:                                          │
 │  ┌─────────────────────────────────────────────────────┐        │
 │  │ [YouTube] YouTube Premium           $11.99 [Pay]    │        │
-│  │           Feb 28, 2022                                │        │
+│  │           (due date varies based on mock data)       │        │
 │  ├─────────────────────────────────────────────────────┤        │
 │  │ [House]   House Rent               $1,200.00 [Pay]  │        │
-│  │           Mar 31, 2022                                │        │
+│  │           (tomorrow from today)                        │        │
 │  └─────────────────────────────────────────────────────┘        │
 │                                                                  │
 │ CODE STRUCTURE:                                                   │
@@ -641,7 +717,8 @@ isLoading.value = true;         // ← this also triggers Obx
 
 ## TAB 3: PROFILE TAB
 
-### File: `views/profile/profile_tab.dart`
+### File: `pages/profile/profile_tab.dart`
+### Controllers: `pages/profile/profile_controller.dart`, `pages/auth/auth_controller.dart`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -667,6 +744,8 @@ isLoading.value = true;         // ← this also triggers Obx
 │  ├─────────────────────────────────────────────────────┤        │
 │  │ 🔒 Data and privacy                                  │        │
 │  ├─────────────────────────────────────────────────────┤        │
+│  │ 📋 Bills                                             │        │
+│  ├─────────────────────────────────────────────────────┤        │
 │  │ 🚪 Sign Out (red)                                    │        │
 │  └─────────────────────────────────────────────────────┘        │
 │                                                                  │
@@ -675,24 +754,23 @@ isLoading.value = true;         // ← this also triggers Obx
 │  "Account info" →                                                │
 │    Opens dialog to edit name, email, phone                       │
 │    Save → profileController.updateProfile(name, email, phone)   │
-│      → saves to SharedPreferences                               │
+│      → saves via PreferencesService (FlutterSecureStorage)      │
 │                                                                  │
 │  "Personal profile" →                                            │
-│    Bottom sheet with toggles:                                    │
-│      Dark Theme → profileController.toggleTheme()                │
-│        ├── flips isDarkTheme.value                               │
-│        ├── Get.changeThemeMode(dark/light)                       │
-│        └── saves 'is_dark_theme' to SharedPreferences            │
-│                                                                  │
+│    Bottom sheet with toggle:                                     │
 │      Receive Notifications → toggle                              │
 │        → saves 'receive_notifications' to SharedPreferences      │
 │                                                                  │
 │  "Login and security" →                                          │
 │    Bottom sheet: Fingerprint Lock toggle                         │
-│      → saves 'biometrics_enabled' to SharedPreferences           │
+│      → saves 'biometrics_enabled' to FlutterSecureStorage       │
 │                                                                  │
 │  "Data and privacy" →                                            │
 │    Bottom sheet: Export Transactions (mock)                      │
+│                                                                  │
+│  "Bills" →                                                       │
+│    Get.toNamed(Routes.bills) → navigates to BillsScreen         │
+│      (separate full-screen view via /bills route)                │
 │                                                                  │
 │  "Sign Out" →                                                    │
 │    Confirmation dialog →                                         │
@@ -700,8 +778,8 @@ isLoading.value = true;         // ← this also triggers Obx
 │        ├── AuthService.signOut()                                 │
 │        │     ├── GoogleSignIn.signOut()                          │
 │        │     └── FirebaseAuth.signOut()                         │
-│        ├── SharedPreferences: onboarding_completed = false       │
-│        └── Get.offAllNamed('/onboarding')                        │
+│        ├── PreferencesService: onboarding_completed = false     │
+│        └── Get.offAllNamed(Routes.onboarding)                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -709,7 +787,7 @@ isLoading.value = true;         // ← this also triggers Obx
 
 # PART 4: THE ADD TRANSACTION FLOW (Most Important)
 
-### File: `views/add_transaction/add_transaction_screen.dart`
+### File: `pages/add_transaction/add_transaction_view.dart`
 
 This is the most complex screen. Here's exactly what happens:
 
@@ -845,57 +923,53 @@ This is the most complex screen. Here's exactly what happens:
 
 # PART 5: HOW TRANSACTIONCONTROLLER WORKS INSIDE
 
-### File: `controllers/transaction_controller.dart`
+### File: `pages/home/transaction_controller.dart`
 
 This is the most important controller. Let's trace through it completely.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ 1. CREATION (happens in main.dart)                              │
+│ 1. CREATION (happens via DashboardBinding when first needed)    │
 │                                                                  │
-│    Get.put(TransactionController());                             │
+│    Get.lazyPut(() => TransactionController(), fenix: true);     │
 │                                                                  │
 │    When created, onInit() runs:                                  │
-│      loadTransactions()                                          │
+│      ever(transactions, (_) => _recalculateTotals());           │
+│      loadTransactions();                                         │
 │                                                                  │
 │ 2. loadTransactions() — reads from phone storage                │
+│    (via PreferencesService, which uses FlutterSecureStorage)     │
 │                                                                  │
-│    loadTransactions() async {                                    │
+│    loadTransactions() async {                                   │
 │      isLoading = true                                           │
 │                                                                  │
-│      // Open phone storage                                       │
-│      prefs = await SharedPreferences.getInstance()              │
+│      // Use PreferencesService (GetxService) to read             │
+│      loaded = await _prefsService.loadTransactions()            │
 │                                                                  │
-│      // Try to read saved data                                   │
-│      transString = prefs.getString('transactions')              │
-│                                                                  │
-│      if (transString != null) {                                  │
-│        // Convert JSON string back to Transaction objects        │
-│        jsonList = jsonDecode(transString)                       │
-│        // Convert each JSON item → TransactionModel             │
-│        transactions = jsonList.map((e) =>                        │
-│          TransactionModel.fromJson(e)                            │
-│        ).toList()                                                │
+│      if (loaded is not empty) {                                 │
+│        // Data exists in storage → load it                       │
+│        transactions.value = loaded                               │
 │      }                                                          │
-│      else {                                                     │
-│        // FIRST TIME: create 5 sample transactions              │
-│        transactions = [                                          │
-│          TransactionModel(id:'t_1', title:'Upwork',             │
-│            amount:850, type:'income', ...),                      │
-│          TransactionModel(id:'t_2', title:'Transfer',           │
-│            amount:85, type:'expense', ...),                      │
-│          TransactionModel(id:'t_3', title:'Paypal',             │
-│            amount:1406, type:'income', ...),                     │
-│          TransactionModel(id:'t_4', title:'Youtube',            │
-│            amount:11.99, type:'expense', ...),                   │
-│          TransactionModel(id:'t_5', title:'Starbucks',          │
-│            amount:150, type:'expense', ...),                     │
-│        ]                                                         │
+│      else if (MockData.useMockData) {                           │
+│        // FIRST TIME: use seed data from MockData class          │
+│        transactions.value = MockData.defaultTransactions         │
 │        saveTransactions()  ← save these to phone                │
 │      }                                                          │
 │                                                                  │
 │      isLoading = false                                          │
 │    }                                                             │
+│                                                                  │
+│    MockData.defaultTransactions (in data/mock_data.dart):       │
+│      [TransactionModel(id:'t_1', title:'Upwork',                │
+│         amount:850,   type:'income',  date: now),               │
+│       TransactionModel(id:'t_2', title:'Transfer',              │
+│         amount:85,    type:'expense', date: now - 1 day),       │
+│       TransactionModel(id:'t_3', title:'Paypal',                │
+│         amount:1406,  type:'income',  date: Jan 30, 2022),      │
+│       TransactionModel(id:'t_4', title:'Youtube',               │
+│         amount:11.99, type:'expense', date: Jan 16, 2022),      │
+│       TransactionModel(id:'t_5', title:'Starbucks',             │
+│         amount:150,   type:'expense', date: Jan 12, 2022)]      │
 │                                                                  │
 │ 3. addTransaction(newTx) — adds new transaction                 │
 │                                                                  │
@@ -903,7 +977,7 @@ This is the most important controller. Let's trace through it completely.
 │      // Add to the FRONT of the list                             │
 │      transactions.insert(0, transaction);                        │
 │                                                                  │
-│      // Save to phone storage                                    │
+│      // Save to phone storage via PreferencesService             │
 │      saveTransactions();                                         │
 │                                                                  │
 │      // Also update the wallet's balance                         │
@@ -911,28 +985,25 @@ This is the most important controller. Let's trace through it completely.
 │      wc.updateWalletBalance(                                     │
 │        transaction.walletId,     ← which wallet                  │
 │        transaction.amount,       ← how much                      │
-│        transaction.type          ← 'income' adds, 'expense' subtracts
+│        transaction.type          ← 'income' adds, 'expense' sub  │
 │      );                                                          │
 │    }                                                             │
 │                                                                  │
 │ 4. saveTransactions() — writes to phone storage                 │
 │                                                                  │
 │    saveTransactions() async {                                    │
-│      prefs = await SharedPreferences.getInstance()              │
+│      // Delegates to PreferencesService (FlutterSecureStorage)   │
+│      await _prefsService.saveTransactions(transactions.toList()) │
 │                                                                  │
-│      // Convert all Transaction objects → JSON string           │
-│      jsonString = jsonEncode(                                    │
-│        transactions.map((e) => e.toJson()).toList()             │
-│      )                                                           │
-│                                                                  │
-│      // Save to phone under key 'transactions'                  │
-│      prefs.setString('transactions', jsonString)                │
+│      // Inside PreferencesService:                               │
+│      //   1. jsonEncode(transactions.map(e → e.toJson()))       │
+│      //   2. Write to FlutterSecureStorage (encrypted)          │
+│      //      under key 'transactions'                           │
 │    }                                                             │
 │                                                                  │
 │ 5. deleteTransaction(id) — removes a transaction                │
 │                                                                  │
 │    deleteTransaction(String transactionId) {                     │
-│      // Find the transaction in the list                         │
 │      index = transactions.indexWhere((t) => t.id == id)         │
 │                                                                  │
 │      if (index != -1) {                                          │
@@ -952,41 +1023,59 @@ This is the most important controller. Let's trace through it completely.
 │      }                                                           │
 │    }                                                             │
 │                                                                  │
-│ 6. Computed properties                                           │
+│ 6. Reactive totals (with ever() listener)                        │
 │                                                                  │
-│    double get totalIncome {                                      │
-│      // Go through all transactions, sum up ones with type == 'income'
-│      return transactions                                         │
-│          .where((t) => t.type == 'income')                       │
-│          .fold(0.0, (sum, t) => sum + t.amount);                 │
+│    // Instead of computed getters, totals are Rx< double > that  │
+│    // auto-recalculate whenever the transactions list changes:   │
+│                                                                  │
+│    rxTotalIncome = 0.0.obs                                       │
+│    rxTotalExpenses = 0.0.obs                                     │
+│                                                                  │
+│    onInit() {                                                    │
+│      ever(transactions, (_) => _recalculateTotals());            │
+│      // ↑ "every time transactions changes, run this function"   │
 │    }                                                             │
 │                                                                  │
-│    double get totalExpenses {                                    │
-│      // Same but for 'expense' type                              │
-│      return transactions                                         │
-│          .where((t) => t.type == 'expense')                      │
-│          .fold(0.0, (sum, t) => sum + t.amount);                 │
+│    _recalculateTotals() {                                        │
+│      // Loop through all transactions and sum income vs expense  │
+│      rxTotalIncome.value = sum of all 'income' amounts          │
+│      rxTotalExpenses.value = sum of all 'expense' amounts       │
 │    }                                                             │
+│                                                                  │
+│    // Exposed as regular getters:                                │
+│    double get totalIncome => rxTotalIncome.value;                │
+│    double get totalExpenses => rxTotalExpenses.value;            │
+│                                                                  │
+│ 7. Filtering (used by Statistics tab)                            │
+│                                                                  │
+│    selectedPeriod = 'Week'.obs   // 'Day', 'Week', 'Month',     │
+│                                  // 'Year'                       │
+│    selectedType = 'expense'.obs  // 'income' or 'expense'       │
 │                                                                  │
 │    List<TransactionModel> get filteredTransactions {             │
 │      // Return only transactions that match selected period      │
-│      // and selected type (income/expense)                       │
-│      // Used by Statistics tab for charts                        │
+│      // AND selected type                                        │
+│      // Used by Statistics tab for line chart                    │
 │      now = DateTime.now()                                        │
-│      if (selectedPeriod == 'Day')   threshold = now - 1 day     │
-│      if (selectedPeriod == 'Week')  threshold = now - 7 days    │
-│      if (selectedPeriod == 'Month') threshold = now - 30 days   │
-│      if (selectedPeriod == 'Year')  threshold = now - 365 days  │
+│      threshold = switch (selectedPeriod.value) {                 │
+│        'Day'   => now - 1 day                                    │
+│        'Week'  => now - 7 days                                   │
+│        'Month' => now - 30 days                                  │
+│        _       => now - 365 days  // 'Year'                      │
+│      }                                                           │
 │                                                                  │
 │      return transactions.where(                                  │
-│        type == selectedType AND date > threshold                 │
+│        type == selectedType.value AND date.isAfter(threshold)    │
 │      ).toList()                                                  │
 │    }                                                             │
 │                                                                  │
 │    Map<String, double> get categoryBreakdown {                   │
-│      // Group filtered transactions by category                  │
-│      // e.g., {'Subscriptions': 11.99, 'Food': 150.00}          │
-│      // Used on Statistics tab for pie/bar chart                 │
+│      // Group filteredTransactions by category                   │
+│      // e.g., {'Subscriptions': 11.99, 'Food & Dining': 150.00} │
+│      // Used on Statistics tab for chart breakdown               │
+│      for each t in filteredTransactions:                         │
+│        breakdown[t.category] += t.amount                         │
+│      return breakdown                                            │
 │    }                                                             │
 │ }                                                                │
 └─────────────────────────────────────────────────────────────────┘
@@ -1038,8 +1127,8 @@ class TransactionModel {
 
 ### How JSON conversion works:
 ```
-Saving:   TransactionModel → toJson() → Map → jsonEncode → String → SharedPreferences
-Loading:  SharedPreferences → String → jsonDecode → Map → fromJson() → TransactionModel
+Saving:   TransactionModel → toJson() → Map → jsonEncode → String → FlutterSecureStorage
+Loading:  FlutterSecureStorage → String → jsonDecode → Map → fromJson() → TransactionModel
 ```
 
 Example of what's actually stored on phone:
@@ -1066,10 +1155,10 @@ Example of what's actually stored on phone:
 class WalletModel {
   final String id;          // unique ID
   final String name;        // "Mono Debit Card"
-  final double balance;     // 5750.25
-  final String cardHolder;  // "IRVAN MOSES"
+  final double balance;     // 2548.00
+  final String cardHolder;  // "Mahfujur Rahman"
   final String cardNumber;  // "**** **** **** 8075" (masked)
-  final String expiryDate;  // "12/28"
+  final String expiryDate;  // "22/01"
   final String type;        // 'card', 'bank', 'cash'
   final int colorIndex;     // which gradient color to use (0-4)
   final String? bankLogo;   // "Visa", "PayPal"
@@ -1135,16 +1224,13 @@ class BillModel {
 │                                                                  │
 │ FONTS: Google Outfit font across all text                       │
 │                                                                  │
-│ HOW THEME TOGGLE WORKS:                                          │
-│   ProfileController.toggleTheme()                               │
-│     ├── isDarkTheme.value = !isDarkTheme.value                   │
-│     ├── Get.changeThemeMode(ThemeMode.dark or ThemeMode.light)  │
-│     └── saves 'is_dark_theme' to SharedPreferences              │
-│                                                                  │
-│   When app restarts:                                             │
-│     ProfileController.loadProfileSettings()                     │
-│     ├── reads 'is_dark_theme' from SharedPreferences            │
-│     └── Get.changeThemeMode() accordingly                       │
+│ DARK THEME SUPPORT:                                               │
+│   AppTheme.darkTheme is fully defined but currently not           │
+│   togglable from the UI — main.dart uses themeMode: ThemeMode    │
+│   .light (hardcoded).                                            │
+│   ProfileController loads/saves 'is_dark_theme' to SharedPrefs   │
+│   but no UI toggle calls Get.changeThemeMode() yet.              │
+│   (Theme is ready for future implementation.)                     │
 │                                                                  │
 │ CARD GRADIENTS (for wallet cards):                               │
 │   cardGradients = [                                              │
@@ -1195,19 +1281,24 @@ USER TAPS ON SCREEN
 │  filteredTx      │──→ calculated with filters
 └────────┬─────────┘
          │
-    ┌────┴────┐
+     ┌────┴────┐
     │         │
     ▼         ▼
-┌────────┐ ┌──────────────────┐
-│ MODEL  │ │ SHAREDPREFERENCES│
-│ File   │ │ (Phone Storage)  │
-│        │ │                  │
-│ toJson │ │ key:             │
-│ fromJson││ 'transactions'   │
-│        │ │ value: JSON      │
-│ Blue-  │ │ string           │
-│ print  │ │                  │
-└────────┘ └──────────────────┘
+┌────────┐ ┌────────────────────────────┐
+│ MODEL  │ │ PREFERENCES SERVICE        │
+│ File   │ │ (GetxService)              │
+│        │ │                            │
+│ toJson │ │ ├── FlutterSecureStorage   │
+│ fromJson│ │ │   (encrypted data)      │
+│        │ │ │   'transactions' → JSON  │
+│ Blue-  │ │ │   'wallets'      → JSON  │
+│ print  │ │ │   'bills'        → JSON  │
+│        │ │ │                            │
+│        │ │ └── SharedPreferences      │
+│        │ │     (plain settings)       │
+│        │ │     'is_dark_theme' → bool │
+│        │ │     'onboarding_completed' │
+└────────┘ └────────────────────────────┘
          │
          ▼
     DATA CHANGED
@@ -1233,13 +1324,14 @@ USER TAPS ON SCREEN
 ```
 VIEW FILE                    CONTROLLERS IT USES
 ─────────────────────        ─────────────────────────────
-splash_screen.dart           None (uses FirebaseAuth directly)
+splash_view.dart             None (uses SplashController locally,
+                              FirebaseAuth directly + PreferencesService)
 
-onboarding_screen.dart       OnboardingController
+onboarding_view.dart         OnboardingController (via GetView)
 
-signin_screen.dart           AuthController, OnboardingController
+signin_view.dart             AuthController, OnboardingController
 
-dashboard_screen.dart        NavigationController (from home_tab.dart)
+dashboard_view.dart          NavigationController
 
 home_tab.dart                TransactionController, WalletController,
                              ProfileController
@@ -1249,37 +1341,50 @@ statistics_tab.dart          TransactionController
 wallet_tab.dart              WalletController, TransactionController,
                              BillController
 
-profile_tab.dart             ProfileController, AuthController
+profile_tab.dart             ProfileController, AuthController,
+                             NavigationController (for back button)
 
-add_transaction_screen.dart  TransactionController, WalletController
+add_transaction_view.dart    TransactionController, WalletController
 
-transaction_details_screen   TransactionController
+transaction_details_view     TransactionController
 
-connect_wallet_screen.dart   WalletController
+connect_wallet_view.dart     WalletController
 
-bills_screen.dart            BillController, WalletController
+bills_view.dart              BillController
 
-bill_details_screen.dart     BillController
+bill_details_view.dart       BillController
 
-bill_payment_screen.dart     BillController, TransactionController,
-                             WalletController
+bill_payment_view.dart       BillController, WalletController
 
-qr_scanner_screen.dart       None (just camera)
+qr_scanner_view.dart         None (just camera)
+
+navigation_controller.dart   None (pure state management)
 
 
 CONTROLLER FILE              SERVICES/MODELS IT USES
 ─────────────────────        ─────────────────────────────
-AuthController               AuthService (firebase_auth + google_sign_in)
+AuthController               AuthService (firebase_auth + google_sign_in),
+                             PreferencesService (for onboarding flag)
 
-TransactionController        TransactionModel, WalletController
+TransactionController        PreferencesService (FlutterSecureStorage),
+                             TransactionModel, WalletController,
+                             MockData (seed data)
 
-WalletController             WalletModel
+WalletController             PreferencesService (FlutterSecureStorage),
+                             WalletModel, MockData (seed data)
 
-BillController               BillModel, TransactionController, Uuid
+BillController               PreferencesService (FlutterSecureStorage),
+                             BillModel, TransactionController,
+                             Uuid, MockData (seed data)
 
-ProfileController            None (just SharedPreferences directly)
+ProfileController            PreferencesService (FlutterSecureStorage
+                             for name/email/phone/biometrics,
+                             SharedPreferences for notif/theme)
 
-OnboardingController         None (just SharedPreferences directly)
+OnboardingController         PreferencesService (SharedPreferences
+                             for onboarding_completed flag)
+
+SplashController             PreferencesService + FirebaseAuth
 ```
 
 ---
@@ -1294,6 +1399,7 @@ User is on Wallet Tab
   ├── Taps "Add" button
   │     │
   │     └── Navigator.push(ConnectWalletScreen())
+  │           │   File: pages/wallet/connect_wallet_view.dart
   │           │
   │           ├── Shows "Cards" tab:
   │           │     ├── Preview credit card (auto-updates as user types)
@@ -1304,10 +1410,10 @@ User is on Wallet Tab
   │           │           └── Creates WalletModel:
   │           │                 id: Uuid().v4()
   │           │                 name: "Mono Debit Card"
-  │           │                 balance: 5750.25  (mock default)
-  │           │                 cardHolder: "IRVAN MOSES"
+  │           │                 balance: 2548.00  (mock default)
+  │           │                 cardHolder: "Mahfujur Rahman"
   │           │                 cardNumber: "**** **** **** 8075"
-  │           │                 expiryDate: "12/28"
+  │           │                 expiryDate: "22/01"
   │           │                 type: 'card'
   │           │                 colorIndex: (cycles through 0-4)
   │           │                 bankLogo: "Visa"
@@ -1316,7 +1422,7 @@ User is on Wallet Tab
   │           │                     │
   │           │                     ├── wallets.add(wallet)  ← adds to list
   │           │                     └── saveWallets()
-  │           │                           └── SharedPreferences: 'wallets' = JSON
+  │           │                           └── via PreferencesService (secure)
   │           │
   │           └── Shows "Accounts" tab:
   │                 ├── Options: Bank Link / Microdeposits / PayPal
@@ -1327,6 +1433,7 @@ User is on Wallet Tab
   │
   ├── Taps "Pay" button
   │     └── Navigator.push(QrScannerScreen())
+  │           │   File: pages/wallet/qr_scanner_view.dart
   │           └── Returns scanned string → snackbar "Payment Processed"
   │
   └── Taps "Send" button
@@ -1376,11 +1483,13 @@ WHEN TRANSACTION IS DELETED:
 
 ```
 User is on Wallet Tab (Upcoming Bills section)
-  or on Bills Screen (from Profile)
+  or on Bills Screen (from Profile → "Bills" menu, /bills route)
   │
   └── Taps "Pay" button on a bill
         │
         └── Get.to(BillPaymentScreen(bill: bill))
+              │   Bill views: pages/bills/bills_view.dart,
+              │              bill_details_view.dart, bill_payment_view.dart
               │
               ├── STEP 1: Review bill details
               │     Show: bill name, amount, due date, provider
@@ -1393,10 +1502,11 @@ User is on Wallet Tab (Upcoming Bills section)
               └── STEP 3: Success / Receipt
                     │
                     └── BillController.payBill(bill.id, walletId, createTransaction: true)
+                          │   Controller: pages/bills/bill_controller.dart
                           │
                           ├── Find bill in list
-                          ├── Mark isPaid = true
-                          ├── saveBills()
+                          ├── Mark isPaid = true (using copyWith)
+                          ├── saveBills() via PreferencesService
                           │
                           └── If createTransaction == true:
                                 ├── Get.find<TransactionController>()
@@ -1409,7 +1519,7 @@ User is on Wallet Tab (Upcoming Bills section)
                                 │     date: DateTime.now(),
                                 │     walletId: walletId,
                                 │     payee: bill.provider,
-                                │     note: 'Auto payment for bill'
+                                │     note: 'Automatic or manual payment for bill'
                                 │   )
                                 └── txController.addTransaction(newTx)
                                       └── Also updates wallet balance!
@@ -1422,17 +1532,20 @@ User is on Wallet Tab (Upcoming Bills section)
 ## Route Map
 
 ```
-GetMaterialApp routes:
-  /splash       → SplashScreen          (animated logo)
-  /onboarding   → OnboardingScreen       (intro + "Get Started")
-  /signin       → SignInScreen           (Google login or Guest)
-  /dashboard    → DashboardScreen        (main app with 4 tabs)
+Route definitions in: lib/routes/routes.dart + lib/routes/pages.dart
+Bindings attached to routes for lazy controller loading:
+
+  /splash       → SplashScreen          (no binding — local controller)
+  /onboarding   → OnboardingScreen       (OnboardingBinding)
+  /signin       → SignInScreen           (no binding — uses global AuthController)
+  /dashboard    → DashboardScreen        (DashboardBinding)
+  /bills        → BillsScreen            (BillsBinding)
 
 Navigating between screens:
   Get.to(() => AddTransactionScreen())         ← push new screen
-  Get.toNamed('/onboarding')                   ← go to named route
+  Get.toNamed(Routes.signin)                   ← go to named route
+  Get.offAllNamed(Routes.dashboard)            ← clear all & go to dashboard
   Get.back()                                   ← go back
-  Get.offAllNamed('/dashboard')                ← clear all & go to dashboard
 ```
 
 ## Screen Hierarchy (Which screens can you reach from where?)
@@ -1444,7 +1557,7 @@ SPLASH
   │      │
   │      └──→ SIGN IN
   │             │
-  │             └──→ DASHBOARD ─────────────────────────────────────
+  │             └──→ DASHBOARD ──────────────────→ /BILLS ─────────
   │                    │                                            │
   │                    ├── [HOME TAB]                               │
   │                    │     ├── Tap transaction → TRANSACTION      │
@@ -1468,26 +1581,27 @@ SPLASH
   │                    │     │                   DETAILS            │
   │                    │     └── "Pay" bill → BILL PAYMENT         │
   │                    │                                            │
-  │                    ├── [PROFILE TAB]                            │
-  │                    │     ├── "Account info" → edit dialog      │
-  │                    │     ├── "Personal profile" → bottom sheet │
-  │                    │     ├── "Login and security" → sheet      │
-  │                    │     ├── "Data and privacy" → sheet       │
-  │                    │     ├── "Bills" → BILLS SCREEN           │
-  │                    │     │              │                        │
-  │                    │     │              ├── Tap bill → BILL    │
-  │                    │     │              │            DETAILS   │
-  │                    │     │              │              │        │
-  │                    │     │              │              └── "Pay │
-  │                    │     │              │                  Now"│
-  │                    │     │              │                    → │
-  │                    │     │              │               BILL   │
-  │                    │     │              │               PAYMENT│
-  │                    │     │              │                      │
-  │                    │     │              └── "+" → add bill     │
-  │                    │     │                       dialog        │
-  │                    │     │                                      │
-  │                    │     └── "Sign Out" → back to ONBOARDING   │
+│                    ├── [PROFILE TAB]                            │
+│                    │     ├── "Account info" → edit dialog      │
+│                    │     ├── "Personal profile" → bottom sheet │
+│                    │     ├── "Message center" → snackbar       │
+│                    │     ├── "Login and security" → sheet      │
+│                    │     ├── "Data and privacy" → sheet       │
+│                    │     ├── "Bills" → /bills → BILLS SCREEN  │
+│                    │     │              │                        │
+│                    │     │              ├── Tap bill → BILL    │
+│                    │     │              │            DETAILS   │
+│                    │     │              │              │        │
+│                    │     │              │              └── "Pay │
+│                    │     │              │                  Now"│
+│                    │     │              │                    → │
+│                    │     │              │               BILL   │
+│                    │     │              │               PAYMENT│
+│                    │     │              │                      │
+│                    │     │              └── "+" → add bill     │
+│                    │     │                       dialog        │
+│                    │     │                                      │
+│                    │     └── "Sign Out" → back to ONBOARDING   │
   │                    │                                            │
   │                    └── DASHBOARD IS BROUGHT BY                  │
   │                        (all routes end here or go through it)  │
@@ -1504,10 +1618,10 @@ SPLASH
 │                        VIEWS LAYER                              │
 │  (What user sees and interacts with)                            │
 │                                                                  │
-│  Files: splash_screen.dart, home_tab.dart,                      │
+│  Files: pages/splash/splash_view.dart, home_tab.dart,           │
 │         statistics_tab.dart, wallet_tab.dart,                   │
-│         profile_tab.dart, add_transaction_screen.dart,          │
-│         bills_screen.dart, etc.                                 │
+│         profile_tab.dart, add_transaction_view.dart,            │
+│         bills_view.dart, etc.                                   │
 │                                                                  │
 │  Job: Display data, capture taps, show animations               │
 │  Pattern: Get data via Get.find<Controller>()                   │
@@ -1521,14 +1635,16 @@ SPLASH
 │                                                                  │
 │  Files: AuthController, TransactionController,                  │
 │         WalletController, BillController,                       │
-│         ProfileController, OnboardingController                 │
+│         ProfileController, OnboardingController,                │
+│         NavigationController                                    │
 │                                                                  │
 │  Job: Hold data in Rx variables, provide functions,             │
-│       persist data to phone storage                             │
-│  Pattern: Get.put() in main.dart                                │
+│       persist data to phone storage via PreferencesService      │
+│  Pattern: Get.lazyPut (with fenix) in bindings                  │
+│           Get.put for AuthController + NavigationController      │
 │           Get.find() everywhere else                            │
 └──────────────────────┬──────────────────────────────────────────┘
-                       │  Reads/Writes
+                       │  Reads/Writes via PreferencesService
                        ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        DATA LAYER                               │
@@ -1538,11 +1654,22 @@ SPLASH
 │           ├── toJson() → for saving                              │
 │           └── fromJson() → for loading                          │
 │                                                                  │
-│  Storage: SharedPreferences (phone key-value store)             │
-│            ├── 'transactions' → JSON string                     │
-│            ├── 'wallets' → JSON string                          │
-│            ├── 'bills' → JSON string                            │
-│            └── 'profile_name', 'is_dark_theme', etc.            │
+│  Gateway: PreferencesService (GetxService)                      │
+│           ├── init() → SharedPreferences + FlutterSecureStorage │
+│           └── Migration from plain to encrypted storage         │
+│                                                                  │
+│  Storage:                                                        │
+│    FlutterSecureStorage (encrypted):                             │
+│      ├── 'transactions' → JSON string                           │
+│      ├── 'wallets' → JSON string                                │
+│      ├── 'bills' → JSON string                                  │
+│      ├── 'profile_name', 'profile_email', 'profile_phone'       │
+│      └── 'biometrics_enabled'                                   │
+│                                                                  │
+│    SharedPreferences (plain):                                   │
+│      ├── 'is_dark_theme' (bool)                                 │
+│      ├── 'receive_notifications' (bool)                         │
+│      └── 'onboarding_completed' (bool)                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1575,8 +1702,10 @@ And the user sees the update instantly.
 |-----------|-------------|
 | **Flutter** | The framework — draws everything on screen |
 | **Dart** | The programming language |
-| **GetX** | State management — connects View ↔ Controller |
-| **SharedPreferences** | Phone storage — saves data permanently |
+| **GetX** | State management + routing + dependency injection |
+| **SharedPreferences** | Plain settings storage (theme, notifs, onboarding flag) |
+| **FlutterSecureStorage** | Encrypted storage for sensitive data (transactions, wallets, bills, profile) |
+| **PreferencesService** | GetxService wrapper around both storage backends, handles migration |
 | **Firebase Auth** | Google login service |
 | **Google Sign-In** | Opens Google login popup |
 | **fl_chart** | Draws the line chart in Statistics |

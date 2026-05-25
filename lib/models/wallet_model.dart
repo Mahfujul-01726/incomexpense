@@ -5,9 +5,9 @@ class WalletModel {
   final String cardHolder;
   final String cardNumber;
   final String expiryDate;
-  final String type; // 'card', 'bank', 'cash'
+  final String type;
   final int colorIndex;
-  final String? bankLogo; // bank logo name
+  final String? bankLogo;
 
   WalletModel({
     required this.id,

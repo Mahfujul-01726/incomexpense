@@ -1,16 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:incomexpense/controllers/bill_controller.dart';
-import 'package:incomexpense/controllers/wallet_controller.dart';
-import 'package:incomexpense/controllers/transaction_controller.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:incomexpense/services/preferences_service.dart';
+import 'package:incomexpense/pages/dashboard/navigation_controller.dart';
+import 'package:incomexpense/pages/bills/bill_controller.dart';
+import 'package:incomexpense/pages/wallet/wallet_controller.dart';
+import 'package:incomexpense/pages/home/transaction_controller.dart';
 import 'package:incomexpense/models/bill_model.dart';
-import 'package:incomexpense/views/bills/bill_details_screen.dart';
+import 'package:incomexpense/pages/bills/bill_details_view.dart';
 
 void main() {
   testWidgets('BillDetailsScreen renders details correctly', (WidgetTester tester) async {
-    // Mock SharedPreferences
+    // Mock SharedPreferences and FlutterSecureStorage
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
+
+    // Inject PreferencesService first
+    Get.put(PreferencesService());
+    Get.put(NavigationController());
 
     // Inject controllers
     final walletController = Get.put(WalletController());

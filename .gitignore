@@ -131,3 +131,6 @@ app.*.symbols
 
 # Exclude community tracker app folder
 /Income & Expense Tracker App (Community)/
+
+# Exclude Jisr patient app
+/jisr_patient_app/

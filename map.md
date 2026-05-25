@@ -1,447 +1,315 @@
-# Income & Expense Tracker — Complete Code Flowchart
+# Income & Expense Tracker — Codebase Map
 
-## 1. APP START — `main.dart`
-
-```
-main() runs
-  │
-  ├── Firebase.initializeApp()           ← starts Google login service
-  ├── SharedPreferences.getInstance()    ← opens phone storage
-  ├── Check: onboarding_completed?       ← have they seen intro?
-  │
-  ├── Get.put(AuthController())          ← creates & stores in memory
-  ├── Get.put(ProfileController())       ← creates & stores in memory  
-  ├── Get.put(WalletController())        ← creates & stores in memory
-  ├── Get.put(TransactionController())   ← creates & stores in memory
-  ├── Get.put(BillController())          ← creates & stores in memory
-  ├── Get.put(OnboardingController())    ← creates & stores in memory
-  ├── Get.put(NavigationController())    ← creates & stores in memory
-  │
-  └── runApp(MyApp())
-        │
-        └── GetMaterialApp(
-              initialRoute: '/splash',
-              routes:
-                '/splash'      → SplashScreen
-                '/onboarding'  → OnboardingScreen
-                '/signin'      → SignInScreen
-                '/dashboard'   → DashboardScreen
-            )
-```
-
----
-
-## 2. SPLASH SCREEN — `views/splash_screen.dart`
+## Project Structure
 
 ```
-SplashScreen shows (animated image for 2.5 seconds)
-  │
-  └── _navigateToNext()
-        │
-        ├── FirebaseAuth.instance.currentUser != null?
-        │     YES → Get.offAllNamed('/dashboard')
-        │
-        └── NO → SharedPreferences: onboarding_completed?
-              YES → Get.offAllNamed('/dashboard')
-              NO  → Get.offAllNamed('/onboarding')
-```
-
----
-
-## 3. ONBOARDING — `views/onboarding/onboarding_screen.dart`
-
-```
-OnboardingScreen
-  │
-  ├── Shows 1 screen with:
-  │     "Spend Smarter Save More" text
-  │     "Get Started" button
-  │     "Already Have Account? Log In" link
-  │
-  ├── Tap "Get Started" →
-  │     controller.completeOnboarding()
-  │     → Get.toNamed('/signin')
-  │
-  └── Tap "Log In" →
-        Get.toNamed('/signin')
-```
-
----
-
-## 4. SIGN IN — `views/auth/signin_screen.dart`
-
-```
-SignInScreen
-  │
-  ├── Uses: Get.find<AuthController>()
-  │        Get.find<OnboardingController>()
-  │
-  ├── Shows: app icon, "Welcome!", 3 feature rows
-  │
-  ├── "Continue with Google" button →
-  │     authController.signInWithGoogle()
-  │     │
-  │     └── AuthController.signInWithGoogle()
-  │           │
-  │           ├── isLoading = true
-  │           ├── _authService.signInWithGoogle()
-  │           │     │
-  │           │     └── auth_service.dart:
-  │           │           GoogleSignIn.signIn()          ← opens Google popup
-  │           │           googleUser.authentication      ← gets tokens
-  │           │           FirebaseAuth.signInWithCredential()  ← logs into Firebase
-  │           │           returns User
-  │           │
-  │           ├── if user != null →
-  │           │     OnboardingController.finishOnboarding()
-  │           │     │
-  │           │     └── OnboardingController.finishOnboarding()
-  │           │           │
-  │           │           ├── SharedPreferences: onboarding_completed = true
-  │           │           └── Get.offAllNamed('/dashboard')
-  │           │
-  │           └── catch error → Get.snackbar("Sign-In Failed")
-  │
-  └── "Continue as Guest" button →
-        onboardingController.finishOnboarding()
-        → same path: save flag → navigate to /dashboard
+lib/
+├── main.dart                          # App entry point
+├── bindings/                          # GetX dependency injection bindings
+│   ├── onboarding_binding.dart        # Injects OnboardingController
+│   ├── dashboard_binding.dart         # Injects Navigation, Wallet, Transaction, Profile controllers
+│   └── bills_binding.dart             # Injects BillController
+├── constants/
+│   ├── app_constants.dart             # Routes, SharedPreferences keys, default values
+│   └── image_assets.dart              # All image asset paths
+├── data/
+│   └── mock_data.dart                 # Default mock transactions, wallets, bills
+├── models/                            # Data models with JSON serialization
+│   ├── transaction_model.dart         # id, title, amount, type, category, date, walletId, payee, note, status
+│   ├── wallet_model.dart              # id, name, balance, cardHolder, cardNumber, expiryDate, type, colorIndex, bankLogo
+│   └── bill_model.dart                # id, name, amount, dueDate, isPaid, category, autoPay, provider (+ copyWith)
+├── pages/
+│   ├── splash/
+│   │   ├── splash_view.dart           # Full-screen splash image with fade animation
+│   │   └── splash_controller.dart     # 2.5s delay → check Firebase auth → check onboarding → navigate
+│   ├── onboarding/
+│   │   ├── onboarding_view.dart       # "Spend Smarter Save More" + "Get Started"/"Log In"
+│   │   └── onboarding_controller.dart # completeOnboarding() → signin; finishOnboarding() → save flag → dashboard
+│   ├── auth/
+│   │   ├── auth_controller.dart       # Google sign-in, sign-out, Firebase auth state stream
+│   │   └── signin/
+│   │       └── signin_view.dart       # "Welcome!" + Google sign-in + "Continue as Guest"
+│   ├── dashboard/
+│   │   ├── dashboard_view.dart        # IndexedStack of 4 tabs + FAB → AddTransactionScreen
+│   │   └── navigation_controller.dart # selectedIndex observable, changeTab()
+│   ├── home/
+│   │   ├── home_tab.dart              # Greeting, balance card, transactions list (last 4), "Send Again"
+│   │   ├── transaction_controller.dart# CRUD transactions, period/type filtering, category breakdown, totals
+│   │   └── transaction_details_view.dart# Invoice-style detail view, delete with wallet reversal, "Download Receipt"
+│   ├── statistics/
+│   │   └── statistics_tab.dart        # Period filter (Day/Week/Month/Year), type dropdown, fl_chart line chart, "Top Spending"
+│   ├── wallet/
+│   │   ├── wallet_tab.dart            # Balance, Add/Pay/Send actions, Transactions/Upcoming Bills tabs
+│   │   ├── wallet_controller.dart     # CRUD wallets, updateWalletBalance (income + / expense -)
+│   │   ├── connect_wallet_view.dart   # Cards/Accounts segmented + card form with live preview, account picker
+│   │   └── qr_scanner_view.dart       # Camera QR scan via mobile_scanner, returns scanned value
+│   ├── add_transaction/
+│   │   └── add_transaction_view.dart  # Merchant picker, amount, date, category, wallet, note, invoice mock
+│   ├── profile/
+│   │   ├── profile_tab.dart           # Avatar, name, menu: Invite/Account/Personal/Security/Data/Sign Out
+│   │   └── profile_controller.dart    # Load/save name, email, phone, dark theme, notifications, biometrics
+│   └── bills/
+│       ├── bills_view.dart            # TabBar: Upcoming/Due + Paid History, "Add Bill" dialog
+│       ├── bill_controller.dart       # CRUD bills, toggleAutoPay, payBill (marks paid + creates transaction)
+│       ├── bill_details_view.dart     # Invoice layout, payment method picker, "Pay Now"
+│       └── bill_payment_view.dart     # 3-step wizard: Review → Confirm → Success receipt
+├── routes/
+│   ├── routes.dart                    # Route constants
+│   └── pages.dart                     # GetPage definitions with bindings
+├── services/
+│   ├── auth_service.dart              # GoogleSignIn + FirebaseAuth wrapper
+│   └── preferences_service.dart       # SharedPreferences + FlutterSecureStorage with migration logic
+├── theme/
+│   └── app_theme.dart                 # Light/dark themes, Google Fonts (Outfit), card gradients, colors
+├── utils/
+│   ├── calculations.dart              # calculateFee(amount) → 2.9% + $0.30
+│   ├── date_helpers.dart              # formatTransactionDate → "Today"/"Yesterday"/"MMM d, yyyy"
+│   └── logo_helpers.dart              # getTransactionLogoAsset, getBillLogoAsset, getLogoPadding
+└── widgets/
+    ├── app_bottom_nav.dart            # BottomAppBar with 4 nav items + center FAB spacer
+    ├── transaction_logo_widget.dart   # Logo or fallback icon for transaction items
+    ├── bill_logo_widget.dart          # Logo or fallback for bill items
+    ├── header_wave_clipper.dart       # CustomClipper for curved header bottom wave
+    ├── dashed_border_painter.dart     # CustomPainter for dashed border on invoice upload
+    └── payment_option_card.dart       # Radio-button card + DebitCardLogo, PayPalLogo, InvoiceRow, TransactionDetailRow
 ```
 
 ---
 
-## 5. DASHBOARD — `views/dashboard_screen.dart`
+## App Flow
 
 ```
-DashboardScreen
+main()
   │
-  ├── Finds: NavigationController (tracks selected tab index)
+  ├── Firebase.initializeApp()
+  ├── Get.putAsync(PreferencesService().init())   ← SharedPreferences + FlutterSecureStorage (with migration)
+  ├── Get.put(AuthController())                   ← Firebase auth state stream
   │
-  ├── _tabs = [HomeTab, StatisticsTab, WalletTab, ProfileTab]
-  │
-  ├── Body: IndexedStack (shows one tab at a time)
-  │
-  ├── FloatingActionButton "+" →
-  │     Get.to(() => AddTransactionScreen())
-  │
-  └── bottomNavigationBar: AppBottomNav (4 icons)
-        Home | Statistics | Wallet | Profile
-```
-
----
-
-## 6. HOME TAB — `views/home/home_tab.dart` (Tab Index 0)
-
-```
-HomeTab
-  │
-  ├── Uses: Get.find<TransactionController>()
-  │        Get.find<WalletController>()
-  │        Get.find<ProfileController>()
-  │
-  ├── BUILD:
-  │     │
-  │     ├── Greeting: "Good afternoon, [profileController.name]"
-  │     │
-  │     ├── Total Balance Card (Obx auto-updates):
-  │     │     ├── walletController.totalBalance (sum of all wallets)
-  │     │     ├── txController.totalIncome
-  │     │     └── txController.totalExpenses
-  │     │
-  │     ├── "Transactions History" (last 4)
-  │     │     ├── txController.transactions.take(4)
-  │     │     ├── each shows: logo, title, date, amount (+/-)
-  │     │     └── Tap → Get.to(TransactionDetailsScreen)
-  │     │
-  │     └── "Send Again" section
-  │           └── shows 5 avatar images
-  │
-  └── ALSO CONTAINS: NavigationController class
-        var selectedIndex = 0.obs
-        changeTab(int index)  ← used by other tabs to switch to Home
+  └── runApp(MyApp) → GetMaterialApp(
+        initialRoute: '/splash',
+        getPages: [
+          '/splash'     → SplashScreen
+          '/onboarding' → OnboardingScreen  (OnboardingBinding)
+          '/signin'     → SignInScreen
+          '/dashboard'  → DashboardScreen     (DashboardBinding)
+          '/bills'      → BillsScreen         (BillsBinding)
+        ]
+      )
 ```
 
 ---
 
-## 7. ADD TRANSACTION — `views/add_transaction/add_transaction_screen.dart`
+## Navigation Flow & Routes
 
+| Route | Screen | Binding Injected |
+|-------|--------|-----------------|
+| `/splash` | SplashScreen | (none — local controller) |
+| `/onboarding` | OnboardingScreen | OnboardingController |
+| `/signin` | SignInScreen | (none — uses global AuthController) |
+| `/dashboard` | DashboardScreen | NavigationController, WalletController, TransactionController, ProfileController |
+| `/bills` | BillsScreen | BillController |
+
+**Splash → Decision Tree:**
+```
+SplashScreen (2.5s fade animation)
+  │
+  ├── FirebaseAuth.currentUser != null?
+  │     YES → Get.offAllNamed('/dashboard')
+  │
+  └── NO → PreferencesService.getOnboardingCompleted()?
+        YES → Get.offAllNamed('/dashboard')
+        NO  → Get.offAllNamed('/onboarding')
+```
+
+---
+
+## Dashboard Tab System
+
+**DashboardScreen** uses `IndexedStack` with 4 tabs controlled by `NavigationController.selectedIndex`:
+
+| Index | Tab | Key Features |
+|-------|-----|-------------|
+| 0 | **HomeTab** | Greeting ("Good afternoon, {name}"), balance card (total/income/expense), last 4 transactions, "Send Again" avatars |
+| 1 | **StatisticsTab** | Period filter (Day/Week/Month/Year), type (Expense/Income), fl_chart line chart with touch interaction, Top 3 spending |
+| 2 | **WalletTab** | Total balance, Add/Pay/Send actions, sub-tabs: Transactions list / Upcoming Bills with "Pay" buttons |
+| 3 | **ProfileTab** | Avatar, name/@handle, menu: Invite Friends, Account info (edit dialog), Personal profile (notifications toggle), Security (fingerprint lock), Data & Privacy (export), Sign Out |
+
+**FAB** ("+" button) on Dashboard → `AddTransactionScreen` (pushed via `Get.to`)
+
+---
+
+## Controllers & Dependencies
+
+### Global (initialized in main.dart)
+- **`PreferencesService`** (`Get.putAsync`) — encrypted storage for all data, auto-migrates from SharedPreferences to FlutterSecureStorage
+- **`AuthController`** (`Get.put`) — Firebase auth state, `signInWithGoogle()`, `signOut()`
+
+### Dashboard-scoped (injected by DashboardBinding)
+- **`NavigationController`** → `selectedIndex` observable, `changeTab(int)`
+- **`WalletController`** → `wallets` list, `totalBalance`, `addWallet()`, `updateWalletBalance(walletId, amount, type)`
+- **`TransactionController`** → `transactions` list, CRUD operations, `filteredTransactions` (by period+type), `categoryBreakdown`, `totalIncome`/`totalExpenses`
+- **`ProfileController`** → `name`, `email`, `phone`, `isDarkTheme`, `receiveNotifications`, `biometricsEnabled`
+
+### Onboarding-scoped (injected by OnboardingBinding)
+- **`OnboardingController`** → `completeOnboarding()` (navigates to signin), `finishOnboarding()` (saves flag → dashboard)
+
+### Bills-scoped (injected by BillsBinding)
+- **`BillController`** → `bills` list, `addBill()`, `toggleAutoPay()`, `payBill(id, walletId, createTransaction)`
+
+---
+
+## Data Storage
+
+| Data | Storage Backend | Key Prefix | Format |
+|------|----------------|-----------|--------|
+| Transactions | FlutterSecureStorage | `transactions` | JSON array |
+| Wallets | FlutterSecureStorage | `wallets` | JSON array |
+| Bills | FlutterSecureStorage | `bills` | JSON array |
+| Profile name/email/phone | FlutterSecureStorage | `profile_name`, etc. | String |
+| Onboarding flag | SharedPreferences | `onboarding_completed` | bool |
+| Dark theme | SharedPreferences | `is_dark_theme` | bool |
+| Notifications | SharedPreferences | `receive_notifications` | bool |
+| Biometrics | FlutterSecureStorage | `biometrics_enabled` | bool |
+
+**Migration logic:** On first launch, `PreferencesService._migrateIfNecessary()` transfers all sensitive data from SharedPreferences to FlutterSecureStorage.
+
+---
+
+## Key Transactions
+
+### Adding a Transaction (expense example)
 ```
 AddTransactionScreen
-  │
-  ├── Uses: Get.find<TransactionController>()
-  │        Get.find<WalletController>()
-  │
-  ├── State variables:
-  │     _selectedType = 'expense' | 'income'
-  │     _selectedMerchant = Netflix/YouTube/Starbucks/PayPal/Upwork/Other
-  │     _selectedCategory (10 expense / 7 income options)
-  │     _selectedWalletId
-  │     _selectedDate
-  │     _amountController, _titleController, etc.
-  │
-  ├── Form fields:
-  │     NAME (merchant picker) → _showMerchantPicker() bottom sheet
-  │     AMOUNT (numeric input with $)
-  │     DATE (date picker)
-  │     CATEGORY (bottom sheet list)
-  │     WALLET / SOURCE (bottom sheet, or link new)
-  │     NOTE (optional text)
-  │     INVOICE (mock attachment)
-  │
-  └── Tap "Save Expense" or "Save Income" →
-        _submitData()
-        │
-        ├── validates form
-        ├── creates TransactionModel(
-        │     id: Uuid().v4(),
-        │     title, amount, type, category, date,
-        │     walletId, payee, note, status: 'completed'
-        │   )
-        │
+  ├── User picks merchant (Netflix/YouTube/Starbucks/PayPal/Upwork/Other)
+  ├── Fills amount, date, category, wallet, note (invoice attachment is mock)
+  └── _submitData()
+        ├── Creates TransactionModel (id: UUID, status: 'completed')
         └── txController.addTransaction(newTx)
-              │
-              └── TransactionController.addTransaction()
-                    │
-                    ├── transactions.insert(0, transaction)    ← adds to top of list
-                    ├── saveTransactions()                      ← saves to phone
-                    │     │
-                    │     └── SharedPreferences:
-                    │           key: 'transactions'
-                    │           value: JSON string of all transactions
-                    │
-                    └── WalletController.updateWalletBalance()
-                          │
-                          ├── finds wallet by walletId
-                          ├── if income → balance += amount
-                          ├── if expense → balance -= amount
-                          └── saveWallets()    ← saves updated balance
+              ├── transactions.insert(0, newTx)    ← reactive list updates UI
+              ├── saveTransactions()               ← secure storage
+              └── WalletController.updateWalletBalance(walletId, amount, 'expense')
+                    ├── wallet.balance -= amount
+                    └── saveWallets()
+```
+
+### Deleting a Transaction
+```
+TransactionDetailsScreen → delete button
+  └── txController.deleteTransaction(id)
+        ├── transactions.removeAt(index)
+        ├── saveTransactions()
+        └── WalletController.updateWalletBalance(walletId, amount, reverseType)
+              └── reverses the original income/expense effect
+```
+
+### Paying a Bill
+```
+BillsScreen / WalletTab → "Pay" button
+  └── BillPaymentScreen (3-step wizard)
+        Step 1: Review bill details + select payment method
+        Step 2: Confirm payment summary
+        Step 3: Success screen with receipt
+        └── _processPayment()
+              └── billController.payBill(id, walletId, createTransaction: false)
+                    ├── bill.isPaid = true
+                    ├── saveBills()
+                    └── (transaction is NOT auto-created; payment is just marked paid)
+```
+
+### Sending Money (from WalletTab → "Send")
+```
+WalletTab → "Send" bottom sheet
+  ├── Enter recipient name, amount, select wallet
+  └── walletController.updateWalletBalance(walletId, amount, 'expense')
+      txController.addTransaction(TransactionModel(type:'expense', category:'Transfer'))
 ```
 
 ---
 
-## 8. TRANSACTION DETAILS — `views/home/transaction_details_screen.dart`
+## Theme System
 
-```
-TransactionDetailsScreen(transaction: tx)
-  │
-  ├── Uses: Get.find<TransactionController>()
-  │
-  ├── Shows: logo, title, category badge
-  │         Status (COMPLETED/PENDING)
-  │         From/To, Time, Date, Spending, Fee
-  │
-  ├── Tap delete icon (trash) →
-  │     _showDeleteConfirmation()
-  │     │
-  │     └── confirm →
-  │           txController.deleteTransaction(widget.transaction.id)
-  │           │
-  │           └── TransactionController.deleteTransaction()
-  │                 ├─ finds transaction in list
-  │                 ├─ transactions.removeAt(index)
-  │                 ├─ saveTransactions()
-  │                 └─ WalletController.updateWalletBalance()
-  │                       (reverse: income→expense, expense→income)
-  │
-  └── "Download Receipt" button → snackbar (mock)
-```
+- **Colors:** Primary teal (#429690), Secondary (#2F7E79), Income green (#25A969), Expense red (#F95B5A), Warning amber (#F59E0B)
+- **Font:** Google Fonts "Outfit" throughout the app
+- **Dark Mode:** Toggle in Profile → Personal profile (currently UI supports it but themeMode is hardcoded to `ThemeMode.light` in main.dart)
+- **Card Gradients:** 5 predefined gradient pairs in `AppTheme.cardGradients` for wallet cards
+- **Decorative pattern:** Concentric circles + `HeaderWaveClipper` on most screens (Home, AddTransaction, Wallet, Profile, TransactionDetails, BillDetails)
 
 ---
 
-## 9. STATISTICS TAB — `views/statistics/statistics_tab.dart` (Tab Index 1)
+## Key Dependencies (pubspec.yaml)
 
-```
-StatisticsTab
-  │
-  ├── Uses: Get.find<TransactionController>()
-  │
-  ├── Period Filter: Day | Week | Month | Year
-  │     → txController.selectedPeriod.value = 'Week'
-  │
-  ├── Type dropdown: Expense | Income
-  │     → txController.selectedType.value = 'expense'
-  │
-  ├── Line Chart (fl_chart):
-  │     ├── Chart data changes based on period + type
-  │     ├── Touch interaction highlights dots
-  │     └── Tooltip shows dollar amount
-  │
-  └── "Top Spending" list (top 3 expenses by amount)
-        └── Tap → Get.to(TransactionDetailsScreen)
-```
+| Package | Purpose |
+|---------|---------|
+| `get` ^4.7.3 | State management, DI, routing |
+| `fl_chart` ^1.2.0 | Statistics line chart |
+| `intl` ^0.20.2 | Date/number formatting |
+| `google_fonts` ^8.1.0 | Outfit font |
+| `shared_preferences` ^2.5.5 | Simple key-value storage |
+| `flutter_secure_storage` ^10.3.0 | Encrypted storage for sensitive data |
+| `uuid` ^4.5.3 | Generate unique IDs |
+| `firebase_core` ^3.6.0 | Firebase initialization |
+| `firebase_auth` ^5.3.1 | Firebase Authentication |
+| `google_sign_in` ^6.2.1 | Google Sign-In |
+| `mobile_scanner` ^7.2.0 | QR code scanning |
+| `permission_handler` ^12.0.1 | Camera permission |
 
 ---
 
-## 10. WALLET TAB — `views/wallet/wallet_tab.dart` (Tab Index 2)
+## File Index (all 30 Dart files)
 
-```
-WalletTab
-  │
-  ├── Uses: Get.find<WalletController>()
-  │        Get.find<TransactionController>()
-  │        Get.find<BillController>()
-  │
-  ├── Shows: Total Balance (from wallets)
-  │
-  ├── Action buttons:
-  │     "Add" → ConnectWalletScreen (add card/bank)
-  │     "Pay" → QrScannerScreen (mock QR scan)
-  │     "Send" → Bottom sheet: recipient + amount + wallet
-  │               → creates Transaction + updates wallet balance
-  │
-  ├── Tab selector: "Transactions" | "Upcoming Bills"
-  │
-  ├── Transactions tab:
-  │     ├── txController.transactions (sorted by date)
-  │     └── each → tap → TransactionDetailsScreen
-  │
-  └── Upcoming Bills tab:
-        ├── billController.bills (unpaid)
-        └── each → "Pay" button → BillPaymentScreen
-```
-
----
-
-## 11. CONNECT WALLET — `views/wallet/connect_wallet_screen.dart`
-
-```
-ConnectWalletScreen
-  │
-  ├── Uses: Get.find<WalletController>()
-  │
-  ├── Segmented control: "Cards" | "Accounts"
-  │
-  ├── Cards view:
-  │     ├── Visual credit card preview (live-updates)
-  │     ├── Form: Name on card, card number, CVC, expiry, ZIP
-  │     └── "Link Card Now" →
-  │           _saveCardWallet()
-  │           └── creates WalletModel(type:'card') → walletController.addWallet()
-  │
-  └── Accounts view:
-        ├── Options: Bank Link | Microdeposits | PayPal
-        └── "Next" →
-              _saveAccountWallet()
-              └── creates WalletModel(type:'bank') → walletController.addWallet()
-```
-
----
-
-## 12. PROFILE TAB — `views/profile/profile_tab.dart` (Tab Index 3)
-
-```
-ProfileTab
-  │
-  ├── Uses: Get.find<ProfileController>()
-  │        Get.find<AuthController>()
-  │
-  ├── Shows: Avatar, name, @handle
-  │
-  ├── Menu options:
-  │     ├── "Invite Friends" → snackbar (mock)
-  │     │
-  │     ├── "Account info" → edit dialog (name, email, phone)
-  │     │     → profileController.updateProfile() → saves to SharedPreferences
-  │     │
-  │     ├── "Personal profile" → bottom sheet:
-  │     │     ├── Dark Theme toggle
-  │     │     │     → profileController.toggleTheme()
-  │     │     │       ├── flips isDarkTheme
-  │     │     │       ├── Get.changeThemeMode(dark/light)
-  │     │     │       └── saves to SharedPreferences
-  │     │     │
-  │     │     └── Receive Notifications toggle
-  │     │
-  │     ├── "Login and security" → bottom sheet:
-  │     │     └── Fingerprint Lock toggle
-  │     │
-  │     ├── "Data and privacy" → bottom sheet:
-  │     │     └── Export Transactions (mock)
-  │     │
-  │     └── "Sign Out" (red text) →
-  │           confirmation dialog →
-  │           AuthController.signOut()
-  │           ├── _authService.signOut()
-  │           │     ├── GoogleSignIn.signOut()
-  │           │     └── FirebaseAuth.signOut()
-  │           ├── SharedPreferences: onboarding_completed = false
-  │           └── Get.offAllNamed('/onboarding')
-```
+| # | File Path | Role |
+|---|-----------|------|
+| 1 | `lib/main.dart` | App entry, Firebase init, DI setup |
+| 2 | `lib/routes/routes.dart` | Route name constants |
+| 3 | `lib/routes/pages.dart` | GetPage route definitions |
+| 4 | `lib/bindings/onboarding_binding.dart` | DI: OnboardingController |
+| 5 | `lib/bindings/dashboard_binding.dart` | DI: Navigation, Wallet, Transaction, Profile controllers |
+| 6 | `lib/bindings/bills_binding.dart` | DI: BillController |
+| 7 | `lib/constants/app_constants.dart` | Route keys, pref keys, default values |
+| 8 | `lib/constants/image_assets.dart` | Image path constants |
+| 9 | `lib/data/mock_data.dart` | Default mock transactions, wallets, bills |
+| 10 | `lib/models/transaction_model.dart` | Transaction data model |
+| 11 | `lib/models/wallet_model.dart` | Wallet data model |
+| 12 | `lib/models/bill_model.dart` | Bill data model (+ copyWith) |
+| 13 | `lib/services/auth_service.dart` | Google + Firebase auth wrapper |
+| 14 | `lib/services/preferences_service.dart` | Secure/preferences storage with migration |
+| 15 | `lib/theme/app_theme.dart` | Light/dark theme definitions |
+| 16 | `lib/utils/calculations.dart` | Fee calculation |
+| 17 | `lib/utils/date_helpers.dart` | Date formatting |
+| 18 | `lib/utils/logo_helpers.dart` | Logo asset resolution |
+| 19 | `lib/widgets/app_bottom_nav.dart` | Bottom navigation bar |
+| 20 | `lib/widgets/transaction_logo_widget.dart` | Transaction logo display |
+| 21 | `lib/widgets/bill_logo_widget.dart` | Bill logo display |
+| 22 | `lib/widgets/header_wave_clipper.dart` | Header wave shape |
+| 23 | `lib/widgets/dashed_border_painter.dart` | Dashed border for invoice |
+| 24 | `lib/widgets/payment_option_card.dart` | Payment method card + related widgets |
+| 25 | `lib/pages/splash/splash_view.dart` | Splash screen |
+| 26 | `lib/pages/splash/splash_controller.dart` | Splash logic |
+| 27 | `lib/pages/onboarding/onboarding_view.dart` | Onboarding screen |
+| 28 | `lib/pages/onboarding/onboarding_controller.dart` | Onboarding navigation |
+| 29 | `lib/pages/auth/auth_controller.dart` | Auth state management |
+| 30 | `lib/pages/auth/signin/signin_view.dart` | Sign-in screen |
+| 31 | `lib/pages/dashboard/dashboard_view.dart` | Main dashboard scaffold |
+| 32 | `lib/pages/dashboard/navigation_controller.dart` | Tab navigation state |
+| 33 | `lib/pages/home/home_tab.dart` | Home tab content |
+| 34 | `lib/pages/home/transaction_controller.dart` | Transaction CRUD + filtering |
+| 35 | `lib/pages/home/transaction_details_view.dart` | Transaction detail view |
+| 36 | `lib/pages/statistics/statistics_tab.dart` | Statistics + chart |
+| 37 | `lib/pages/wallet/wallet_controller.dart` | Wallet CRUD + balance updates |
+| 38 | `lib/pages/wallet/wallet_tab.dart` | Wallet tab content |
+| 39 | `lib/pages/wallet/connect_wallet_view.dart` | Add card/bank wallet form |
+| 40 | `lib/pages/wallet/qr_scanner_view.dart` | QR scanner screen |
+| 41 | `lib/pages/add_transaction/add_transaction_view.dart` | Add transaction form |
+| 42 | `lib/pages/profile/profile_controller.dart` | Profile settings management |
+| 43 | `lib/pages/profile/profile_tab.dart` | Profile tab content |
+| 44 | `lib/pages/bills/bill_controller.dart` | Bill CRUD + payment |
+| 45 | `lib/pages/bills/bills_view.dart` | Bills list with tabs |
+| 46 | `lib/pages/bills/bill_details_view.dart` | Bill detail invoice |
+| 47 | `lib/pages/bills/bill_payment_view.dart` | Bill payment wizard |
 
 ---
 
-## 13. BILLS — `views/bills/bills_screen.dart`
-
-```
-BillsScreen (from Profile → Bills)
-  │
-  ├── Uses: Get.find<BillController>()
-  │        Get.find<WalletController>()
-  │
-  ├── TabBar: "Upcoming / Due" | "Paid History"
-  │
-  ├── Each bill shows: logo, name, due status, amount, Pay button
-  │     Status logic:
-  │       difference < 0  → "Overdue by X days" (red)
-  │       difference == 0 → "Due Today" (amber)
-  │       difference == 1 → "Due Tomorrow" (amber)
-  │       difference > 1  → "Due in X days" (blue)
-  │       isPaid == true  → "Paid" (green)
-  │
-  ├── Tap bill → BillDetailsScreen
-  ├── Tap "Pay" → BillPaymentScreen
-  │
-  └── "+" button → _showAddBillDialog()
-        └── fills form → BillController.addBill()
-              └── saves to SharedPreferences
-```
-
----
-
-## 14. BILL DETAILS & PAYMENT
-
-```
-BillDetailsScreen(bill)
-  ├── Invoice-style layout
-  ├── Auto-pay toggle → BillController.toggleAutoPay()
-  └── "Pay Now" → BillPaymentScreen
-
-BillPaymentScreen(bill)
-  ├── 3-step wizard: Review → Confirm → Success
-  ├── BillController.payBill(id, walletId, createTransaction: true)
-  │     ├── marks bill as paid
-  │     ├── creates TransactionModel via TransactionController
-  │     └── wallet balance updated via chain
-  └── Shows receipt on success
-```
-
----
-
-## 15. QR SCANNER — `views/wallet/qr_scanner_screen.dart`
-
-```
-QrScannerScreen (from Wallet → Pay)
-  ├── Opens camera via mobile_scanner
-  └── Returns scanned QR code string back to WalletTab
-```
-
----
-
-## DATA STORAGE SUMMARY
-
-Every controller saves/loads from `SharedPreferences`:
-
-| Controller | Storage Key | What It Saves |
-|-----------|-------------|---------------|
-| TransactionController | `'transactions'` | JSON array of all TransactionModel |
-| WalletController | `'wallets'` | JSON array of all WalletModel |
-| BillController | `'bills'` | JSON array of all BillModel |
-| ProfileController | `'profile_name'`, `'profile_email'`, `'profile_phone'`, `'is_dark_theme'`, etc. | Individual string/bool values |
-| OnboardingController | `'onboarding_completed'` | true/false |
-| AuthController | (via Firebase) | Login state persisted by Firebase |
-
----
-
-## THE COMPLETE CYCLE (Example: User adds an expense)
+## Complete Data Cycle (Example: User adds an expense)
 
 ```
 1. User sees HomeTab → taps "+" FAB
@@ -449,17 +317,17 @@ Every controller saves/loads from `SharedPreferences`:
 3. User fills: Netflix, $9.99, today, Subscriptions, Wallet1, "Monthly"
 4. User taps "Save Expense"
 5. _submitData() runs:
-   a. Creates TransactionModel{id, title:'Netflix', amount:9.99, type:'expense', ...}
+   a. Creates TransactionModel{id: uuid, title:'Netflix', amount:9.99, type:'expense', ...}
 6. txController.addTransaction(tx)
-   a. transactions.insert(0, tx)          ← list updates
-   b. jsonEncode → SharedPreferences     ← saved to phone
+   a. transactions.insert(0, tx)          ← Obx() reactive listeners fire
+   b. _prefsService.saveTransactions()    ← encrypted storage
    c. Get.find<WalletController>().updateWalletBalance(walletId, 9.99, 'expense')
       i.  wallet.balance -= 9.99
-      ii. saveWallets()                  ← wallet saved
+      ii. saveWallets()                  ← encrypted storage
 7. Get.back() returns to HomeTab
-8. Obx() reactive listeners fire:
-   a. Balance card re-renders with new total
-   b. Transaction list re-renders with new item at top
+8. Obx() reactive listeners update:
+   a. Balance card → new total/income/expense
+   b. Transaction list → new item at top
 ```
 
-**Total files involved:** `AddTransactionScreen → TransactionController → WalletController → SharedPreferences → HomeTab auto-updates`
+**Files involved:** `add_transaction_view.dart:30` → `transaction_controller.dart:67` → `wallet_controller.dart:58` → `preferences_service.dart:53,62` → `home_tab.dart:140,250` (auto-updates via Obx)

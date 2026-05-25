@@ -1,14 +1,16 @@
+import '../constants/app_constants.dart';
+
 class TransactionModel {
   final String id;
   final String title;
   final double amount;
-  final String type; // 'income' | 'expense'
+  final String type;
   final String category;
   final DateTime date;
   final String walletId;
   final String payee;
   final String note;
-  final String status; // 'completed' | 'pending' | 'failed'
+  final String status;
 
   TransactionModel({
     required this.id,
@@ -20,7 +22,7 @@ class TransactionModel {
     required this.walletId,
     required this.payee,
     required this.note,
-    this.status = 'completed',
+    this.status = AppConstants.statusCompleted,
   });
 
   Map<String, dynamic> toJson() => {
@@ -46,6 +48,6 @@ class TransactionModel {
         walletId: json['walletId'],
         payee: json['payee'],
         note: json['note'],
-        status: json['status'] ?? 'completed',
+        status: json['status'] ?? AppConstants.statusCompleted,
       );
 }
